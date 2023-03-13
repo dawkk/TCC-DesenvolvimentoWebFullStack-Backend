@@ -15,8 +15,8 @@ router.route("/users")
   .post(UserController.createUser)
 
 router.route("/users/:id")
-  .get(verifyJWT, verifyRoles(ROLES_LIST.User), UserController.listUserById)
-  .put(verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), UserController.updateUser)
+  .get(verifyJWT, UserController.listUserById)
+  .put(verifyJWT, UserController.updateUser)
   .delete(verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), UserController.deleteUser)
 
 /* router.route("/users/me")

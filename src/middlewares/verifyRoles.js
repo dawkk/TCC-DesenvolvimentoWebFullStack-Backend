@@ -4,10 +4,8 @@ const verifyRoles = (...requiredRoles) => {
       return res.json("Roles Error").status(401)};
 
     const userRoles = Object.values(req.roles ?? {});
-
     console.log("requiredRoles", requiredRoles);
     console.log("userRoles", userRoles);
-    
 
     for (const role of requiredRoles) {
       if (!userRoles.includes(role)) {

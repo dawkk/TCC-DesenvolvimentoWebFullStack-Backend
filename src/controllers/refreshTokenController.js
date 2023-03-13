@@ -7,10 +7,10 @@ const handleRefreshToken = async (req, res) => {
   if (!cookies?.jwt) return res.sendStatus(401); /* If there is no cookie or no JWT cookie status 401 Unauthorized */
   
   const refreshToken = cookies.jwt;
-  console.log(refreshToken);
+/*   console.log(refreshToken); */
 
   const findUser = await users.findOne({ refreshToken }).exec();
-  console.log(findUser)
+ /*  console.log(findUser) */
   if (!findUser) return res.json("Error before verify").sendStatus(403); /* If there is no user with such valid refresh cookie on database status 403 Forbidden  */
   
 

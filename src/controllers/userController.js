@@ -44,7 +44,7 @@ class UserController {
       return res.status(422).send({ message: "Por favor, utilize outro e-mail!" });
     } else {
       const salt = await bcrypt.genSalt(12);
-      console.log(req.body);
+      /* console.log(req.body); */
       const passwordHash = await bcrypt.hash(req.body.password, salt);
       user.password = passwordHash;
       user.save((err) => {
@@ -60,7 +60,9 @@ class UserController {
   }
 
   static updateUser = (req, res) => {
+    /* console.log(req.body) */
     const id = req.params.id;
+/*     console.log(id) */
     users.findByIdAndUpdate(id, "-password", { $set: req.body }, (err) => {
       if (!err) {
         return res.status(200).send({ message: 'usuario atualizado com sucesso!' })
@@ -170,8 +172,7 @@ class UserController {
 
     findUser.refreshToken = '';
     const result = await findUser.save();
-    console.log(result);
-
+  /*   console.log(result); */
     res.clearCookie('jwt', { httpOnly: true, secure: true });
     res.sendStatus(204).json({ message: "Logout realizado com sucesso!"});;
   }

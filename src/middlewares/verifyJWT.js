@@ -5,7 +5,7 @@ function verifyJWT(req, res, next) {
   let token;
   if (req.cookies.jwt) {
     token = req.cookies.jwt
-    console.log('logando por cookies', token)
+/*     console.log('logando por cookies', token) */
   } else {
     const authHeader = req.headers.authorization || req.headers.Authorization;
     if (!authHeader?.startsWith('Bearer ')) return res.sendStatus(401);
