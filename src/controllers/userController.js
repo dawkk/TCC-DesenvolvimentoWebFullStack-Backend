@@ -147,8 +147,8 @@ class UserController {
         const id = findUser._id
         findUser.refreshToken = refreshToken;
         const updateUser = await findUser.save();
-        console.log(updateUser);
-        console.log(roles);
+        updateUser;
+        /* console.log(updateUser) */
 
         return res.cookie('jwt', accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }).status(200).json({ message: "Autenticação realizada com sucesso!", accessToken, refreshToken, roles, id });
 

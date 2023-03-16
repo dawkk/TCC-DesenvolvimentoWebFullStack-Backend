@@ -129,4 +129,5 @@ dist
 # Backend ignores
 node_modules
 .env
+.env.test
 readmeSecret.md

@@ -5,7 +5,6 @@ import { upload } from "../config/uploadImg.js";
 
 class DishController {
 
-
   static listDishes = (req, res) => {
     dishes.find()
       .populate('menu')
@@ -35,7 +34,6 @@ class DishController {
   }
 
   static createDish = (req, res) => {
-    /* para lembrar dishes aqui se refere ao schema/coleção que criamos no mongoose em models como referencia */
     let dish = new dishes(req.body);
     dish.save((err) => {
       if (err) {
