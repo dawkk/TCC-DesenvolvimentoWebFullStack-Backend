@@ -25,6 +25,7 @@ class DishController {
       .populate('menu', 'name')
       .exec((err, dishes) => {
         if (err) {
+          console.log('erro na listagem do prato ->',err)
           res.status(400).send({ message: `${err.message} - Id do prato não encontrado. ` })
         } else {
           res.status(200).send(dishes)
@@ -50,6 +51,7 @@ class DishController {
       if (!err) {
         res.status(200).send({ message: 'Prato atualizado com sucesso!' })
       } else {
+        console.log('erro no update do prato ->',err)
         res.status(500).send({ message: err.message })
       }
     })
@@ -61,6 +63,7 @@ class DishController {
       if (!err) {
         res.status(200).send({ message: `Prato ${id} removido com sucesso!` })
       } else {
+        console.log('erro no delete do prato ->',err)
         res.status(500).send({ message: err.message })
       }
     })
