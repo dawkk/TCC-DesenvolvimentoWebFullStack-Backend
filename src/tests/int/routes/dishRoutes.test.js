@@ -24,14 +24,12 @@ afterAll(async () => {
 });
 
 describe('Testing dish routes', () => {
-
   describe('<- Create dish route ->', () => {
     describe('given user is not logged in', () => {
       it('should return a 401', async () => {
         const res = await request(app)
           .post('/dishes')
           .send(dishData);
-
         expect(res.statusCode).toEqual(401);
       });
     })
@@ -41,7 +39,6 @@ describe('Testing dish routes', () => {
           .post('/dishes')
           .set('Authorization', `Bearer ${accessTokenSimpleUser}`)
           .send(dishData);
-
         expect(res.statusCode).toEqual(403);
       });
     });
@@ -52,7 +49,6 @@ describe('Testing dish routes', () => {
           .set('Authorization', `Bearer ${accessTokenAdm}`)
           .send(dishData);
         expect(res.statusCode).toEqual(201);
-
         dishDataResId = res.body._id;
         console.log('este deve ser o ID criado', dishDataResId);
       });
@@ -80,7 +76,6 @@ describe('Testing dish routes', () => {
       it('should return a 200 and get the dishe', async () => {
         const res = await request(app)
           .get(`/dishes/${dishDataResId}`)
-          /* .get(`/dishes/${testingAlreadyExistingDish}`) */
           .set('Authorization', `Bearer ${accessTokenAdm}`)
           .send(dishData);
         expect(res.statusCode).toEqual(200);
@@ -109,7 +104,6 @@ describe('Testing dish routes', () => {
       it('should return a 200 and get all the dishes', async () => {
         const res = await request(app)
           .put(`/dishes/${dishDataResId}`)
-          /* .put(`/dishes/${testingAlreadyExistingDish}`) */
           .set('Authorization', `Bearer ${accessTokenAdm}`)
           .send(updatingDishData);
         expect(res.statusCode).toEqual(200);
