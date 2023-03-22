@@ -14,7 +14,7 @@ router
   .put("/dishes/:id",verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), DishController.updateDish)
   .delete("/dishes/:id",verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), DishController.deleteDish)
   .post("/dishes/:id/image",verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), DishController.uploadDishImage)
-  .get("/dishes/:id/image",verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), DishController.getDishImage)
+  .get("/dishes/:id/image",/* verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), */ DishController.getDishImage)
 
 
 export default router;

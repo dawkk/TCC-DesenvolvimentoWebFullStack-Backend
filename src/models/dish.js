@@ -7,6 +7,7 @@ const dishSchema = new mongoose.Schema({
   price: {type: Number},
   menu: {type: mongoose.Schema.Types.ObjectId, ref:'menus', required: true},
   type: {type: String},
+  image:{type: String}
 });
 
 const dishes = mongoose.model('dishes', dishSchema);
