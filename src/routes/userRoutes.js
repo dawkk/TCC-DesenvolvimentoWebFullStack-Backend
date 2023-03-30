@@ -14,6 +14,9 @@ router.route("/users")
   .get(verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), UserController.listAllUsers)
   .post(UserController.createUser)
 
+router.route("/users/search")
+  .get(verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), UserController.listUserByEmail)
+
 router.route("/users/:id")
   .get(verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), UserController.listUserById)
   .put(verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), UserController.updateUser)
@@ -24,11 +27,11 @@ router.route("/users/:id")
 .put(verifyJWT, verifyRoles(ROLES_LIST.User), UserController.updateSelf) */
 
 router.route("/users/search")
-  .get(verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), UserController.listUserByEmail)
+  .get(verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), UserController.listUserByEmail)
 
 router
   .post("/auth/login", UserController.loginUser)
   .get("/auth/logout", UserController.logoutUser)
-  /* .post("/refresh", handleRefreshToken) */
+/* .post("/refresh", handleRefreshToken) */
 
 export default router;
