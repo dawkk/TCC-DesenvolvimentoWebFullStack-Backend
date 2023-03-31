@@ -25,7 +25,7 @@ class UserController {
       /* Lembrar de deixar o nome do esquema em singular, por ex menus é o esquema porem abaixo usamos menu */
       /*  .populate('menu', 'name') */
       .exec((err, users) => {
-        
+
         if (err) {
           return res.status(400).send({ message: `${err.message} - Id do usuario não encontrado. ` })
         } else {
@@ -44,7 +44,6 @@ class UserController {
       return res.status(422).send({ message: "Por favor, utilize outro e-mail!" });
     } else {
       const salt = await bcrypt.genSalt(12);
-      /* console.log(req.body); */
       const passwordHash = await bcrypt.hash(req.body.password, salt);
       user.password = passwordHash;
       user.save((err) => {
@@ -60,9 +59,7 @@ class UserController {
   }
 
   static updateUser = (req, res) => {
-    /* console.log(req.body) */
     const id = req.params.id;
-/*     console.log(id) */
     users.findByIdAndUpdate(id, "-password", { $set: req.body }, (err) => {
       if (!err) {
         return res.status(200).send({ message: 'usuario atualizado com sucesso!' })
@@ -94,29 +91,34 @@ class UserController {
     })
   }
   /* --------------------SELF GET AND PUT REQUESTS FOR USER TRYING TO IMPLEMENT------------------------- */
-  /* static listSelf = async (req, res) => {
-    try {
-      const user = await users.findById(req.user.id).select('-password');
-      res.status(200).send(user);
-    } catch (err) {
-      res.status(500).send({ message: err.message });
-    }
+
+  static listSelf = async (req, res) => {
+    const id = req.id;
+    users.findById(id, '-password')
+      .exec((err, user) => {
+        if (err) {
+          return res.status(400).send({ message: `${err.message} - Id do usuario não encontrado. ` })
+        } else {
+          if (id !== user._id.toString()) {
+            return res.status(403).send({ message: 'Não autorizado.' });
+          } else {
+            return res.status(200).send(user)
+          }
+        }
+      });
   };
 
   static updateSelf = async (req, res) => {
-    try {
-      const id = req.user.id;
-      const user = await users.findByIdAndUpdate(id, "-password", { $set: req.body }, { new: true });
-      if (user.id === req.user.id) {
+    const id = req.id;
+    users.findByIdAndUpdate(id, { $set: req.body }, (err) => {
+      if (!err) {
         return res.status(200).send({ message: 'usuario atualizado com sucesso!' })
       } else {
-        return res.status(401).send({ message: 'Unauthorized' });
+        return res.status(500).send({ message: err.message })
       }
-    } catch (err) {
-      return res.status(500).send({ message: err.message })
-    }
+    });
   }
- */
+
 
   /* --------------------LOGIN------------------------- */
 
@@ -157,6 +159,7 @@ class UserController {
       }
     }
   }
+
   /* --------------------LOGOUT------------------------- */
   static logoutUser = async (req, res) => {
 
@@ -172,9 +175,9 @@ class UserController {
 
     findUser.refreshToken = '';
     const result = await findUser.save();
-  /*   console.log(result); */
+    /*   console.log(result); */
     res.clearCookie('jwt', { httpOnly: true, secure: true });
-    res.sendStatus(204).json({ message: "Logout realizado com sucesso!"});;
+    res.sendStatus(204).json({ message: "Logout realizado com sucesso!" });;
   }
 }
 

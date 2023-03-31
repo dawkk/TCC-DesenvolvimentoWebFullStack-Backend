@@ -5,7 +5,20 @@ import { upload } from "../config/uploadImg.js";
 
 class DishController {
 
-  static listDishes = (req, res) => {
+  static listDishesFrontend = (req, res) => {
+    dishes.find()
+      .populate('menu')
+      .exec((err, dishes) => {
+        if (err) {
+          res.status(400).send({ message: `${err.message} - Id do prato não encontrado. ` })
+        } else {
+          res.status(200).json(dishes)
+        }
+      }
+      )
+  }
+
+  static listAllDishes = (req, res) => {
     dishes.find()
       .populate('menu')
       .exec((err, dishes) => {

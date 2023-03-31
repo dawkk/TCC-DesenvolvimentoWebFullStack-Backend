@@ -29,144 +29,128 @@ afterAll(async () => {
 });
 
 describe('Testing dish routes', () => {
-  describe('<- Create dish route ->', () => {
-    describe('given user is not logged in', () => {
-      it('should return a 401', async () => {
+
+  describe('Create dish route', () => {
+
+      it('given user is not logged in, should return error 401', async () => {
         const res = await request(app)
           .post('/dishes')
           .send(dishData);
         expect(res.statusCode).toEqual(401);
       });
-    })
-    describe('given user is logged in but has no required authorization', () => {
-      it('should return a 403', async () => {
+
+      it('given user is logged in but doesnt have required authorization, should return error 403', async () => {
         const res = await request(app)
           .post('/dishes')
           .set('Authorization', `Bearer ${accessTokenSimpleUser}`)
           .send(dishData);
         expect(res.statusCode).toEqual(403);
       });
-    });
-    describe('given user is logged in and has authorization', () => {
-      it('should return a 201 and create the dish', async () => {
+
+      it('given user is logged in and has authorization, should return a 201 and create the dish', async () => {
         const res = await request(app)
           .post('/dishes')
           .set('Authorization', `Bearer ${accessTokenAdm}`)
           .send(dishData);
         expect(res.statusCode).toEqual(201);
         dishDataResId = res.body._id;
-        console.log('este deve ser o ID criado', dishDataResId);
-
       });
-    });
   })
 
-  describe('<- Get dishes routes ->', () => {
+  describe('Get dishes routes', () => {
+
     describe('Get a specific dish per id', () => {
-      describe('given user is not logged in', () => {
-        it('should return a 401', async () => {
+
+        it('given user is not logged in, should return error 401', async () => {
           const res = await request(app)
             .get(`/dishes/${dishDataResId}`)
-            .send(dishData);
           expect(res.statusCode).toEqual(401);
         });
-      })
-      describe('given user is logged in but has no required authorization', () => {
-        it('should return a 403', async () => {
+
+
+        it('given user is logged in but doesnt have required authorizations, should return error 403', async () => {
           const res = await request(app)
             .get(`/dishes/${dishDataResId}`)
             .set('Authorization', `Bearer ${accessTokenSimpleUser}`)
-            .send(dishData);
           expect(res.statusCode).toEqual(403);
         });
-      });
-      describe('given user is logged in and has authorization', () => {
-        it('should return a 200 and get the dishe', async () => {
+
+
+        it('given user is logged in and has authorization, should return a 200 and get the dish', async () => {
           const res = await request(app)
             .get(`/dishes/${dishDataResId}`)
             .set('Authorization', `Bearer ${accessTokenAdm}`)
-            .send(dishData);
           expect(res.statusCode).toEqual(200);
         });
-      });
     })
+
     describe('Get all dishes route', () => {
-      describe('given user is not logged in', () => {
-        it('should return a 201', async () => {
+
+        it('given user is not logged in, should return error 401', async () => {
           const res = await request(app)
-            .get(`/dishes`)
-            .send(dishData);
-          expect(res.statusCode).toEqual(200);
+            .get(`/dishes/all`)
+          expect(res.statusCode).toEqual(401);
         });
-      })
-      describe('given user is logged in', () => {
-        it('should return a 203', async () => {
+
+        it('given user is logged in but doesnt have required authorizations, should return error 403', async () => {
           const res = await request(app)
-            .get(`/dishes`)
+            .get(`/dishes/all`)
             .set('Authorization', `Bearer ${accessTokenSimpleUser}`)
-            .send(dishData);
-          expect(res.statusCode).toEqual(200);
+          expect(res.statusCode).toEqual(403);
         });
-      });
-      describe('given user is logged in and has all authorizations', () => {
-        it('should return a 200 and get the dishe', async () => {
+
+        it('given user is logged in and has all authorizations, should return a 200 and get the dish', async () => {
           const res = await request(app)
             .get(`/dishes/${dishDataResId}`)
             .set('Authorization', `Bearer ${accessTokenAdm}`)
-            .send(dishData);
           expect(res.statusCode).toEqual(200);
         });
-      });
     })
   })
 
-  describe('<- Update dish route ->', () => {
-    describe('given user is not logged in', () => {
-      it('should return a 401', async () => {
+  describe('Update dish route', () => {
+
+      it('given user is not logged in, should return error 401', async () => {
         const res = await request(app)
           .put(`/dishes/${dishDataResId}`)
           .send(updatingDishData);
         expect(res.statusCode).toEqual(401);
       });
-    })
-    describe('given user is logged in but has no required authorization', () => {
-      it('should return a 403', async () => {
+
+      it('given user is logged in but doest have required authorizations, should return error 403', async () => {
         const res = await request(app)
           .put(`/dishes/${dishDataResId}`)
           .set('Authorization', `Bearer ${accessTokenSimpleUser}`)
           .send(updatingDishData);
         expect(res.statusCode).toEqual(403);
       });
-    });
-    describe('given user is logged in and has authorization', () => {
-      it('should return a 200 and get all the dishes', async () => {
+
+      it('given user is logged in and has authorization, should return a 200 and get all the dishes', async () => {
         const res = await request(app)
           .put(`/dishes/${dishDataResId}`)
           .set('Authorization', `Bearer ${accessTokenAdm}`)
           .send(updatingDishData);
         expect(res.statusCode).toEqual(200);
       });
-    });
   })
   
-  describe('<- Delete dish route ->', () => {
-    describe('given user is not logged in', () => {
-      it('should return a 401', async () => {
+  describe('Delete dish route', () => {
+
+      it('given user is not logged in, should return error 401', async () => {
         const res = await request(app)
           .delete(`/dishes/${dishDataResId}`);
         expect(res.statusCode).toEqual(401);
       });
-    })
-    describe('given user is logged in but has no required authorization', () => {
-      it('should return a 403', async () => {
+
+      it('given user is logged in but doesnt have required authorization, should return error 403', async () => {
         const res = await request(app)
           .delete(`/dishes/${dishDataResId}`)
           .set('Authorization', `Bearer ${accessTokenSimpleUser}`);
         expect(res.statusCode).toEqual(403);
       });
-    });
-    describe('given user is logged in and has authorization', () => {
-      it('should return a 200 and delete dish', async () => {
+
+    describe('', () => {
+      it('given user is logged in and has authorization, should return a 200 and delete dish', async () => {
         const res = await request(app)
           .delete(`/dishes/${dishDataResId}`)
           .set('Authorization', `Bearer ${accessTokenAdm}`);
