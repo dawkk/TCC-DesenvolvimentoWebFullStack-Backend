@@ -22,8 +22,6 @@ class UserController {
     const id = req.params.id;
 
     const user = await users.findById(id, '-password')
-      /* Lembrar de deixar o nome do esquema em singular, por ex menus é o esquema porem abaixo usamos menu */
-      /*  .populate('menu', 'name') */
       .exec((err, users) => {
 
         if (err) {
@@ -36,8 +34,21 @@ class UserController {
       );
   }
 
+  static listUserAddresses = async (req, res) => {
+    const id = req.id;
+    try {
+      const user = await users.findById(id);
+      if (!user) {
+        return res.status(404).send({ message: "Usuário não encontrado" });
+      }
+      const addresses = user.addresses;
+      return res.status(200).send(addresses);
+    } catch (err) {
+      return res.status(500).send({ message: err.message });
+    }
+  };
+
   static createUser = async (req, res) => {
-    /* para lembrar users aqui se refere ao schema/coleção que criamos no mongoose em models como referencia */
     let user = new users(req.body);
     const findUser = await users.findOne({ email: req.body.email });
     if (findUser) {
@@ -46,6 +57,7 @@ class UserController {
       const salt = await bcrypt.genSalt(12);
       const passwordHash = await bcrypt.hash(req.body.password, salt);
       user.password = passwordHash;
+      user.addresses.push(req.body.address);
       user.save((err) => {
         if (err) {
           return res.status(500).send({ message: `${err.message} - Falha ao cadastrar usuario.` })
@@ -68,6 +80,24 @@ class UserController {
       }
     })
   }
+
+  static updateUserAddress =  async (req, res) => {
+    const id = req.id;
+    const addressId = req.params;
+    const address = req.body;
+    const user = await users.findById(id);
+    if (!user) {
+      return res.status(404).send({ message: 'Usuário não encontrado.' });
+    }
+    const addressIndex = user.addresses.findIndex(addr => addr._id == addressId);
+    if (addressIndex === -1) {
+      return res.status(404).send({ message: 'Endereço não encontrado.' });
+    }
+    user.addresses[addressIndex] = address;
+    await user.save();
+    return res.status(200).send(user);
+  };
+
 
   static deleteUser = (req, res) => {
     const id = req.params.id;

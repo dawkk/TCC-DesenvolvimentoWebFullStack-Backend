@@ -41,7 +41,28 @@ describe('Testing user routes', () => {
         .send(userData);
       expect(res.statusCode).toEqual(422);
     });
+    
+    describe('Create address for user routes', () => {
+
+      it('given user is not logged in, should return sucessfully 201', async () => {
+        const res = await request(app)
+          .post('/users')
+          .send(userData);
+        userDataResId = res.body._id;
+        expect(res.statusCode).toEqual(201);
+      });
+  
+      it('given user email is already being used in another register, should not register and return error 422', async () => {
+        const res = await request(app)
+          .post('/users')
+          .send(userData);
+        expect(res.statusCode).toEqual(422);
+      });
+      
+    })
+    
   })
+ 
 
   describe('Get user routes', () => {
 
