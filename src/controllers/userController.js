@@ -2,6 +2,7 @@ import users from "../models/user.js"
 import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import verifyJWT from "../middlewares/verifyJWT.js";
+import addresses from "../models/userAddressess.js";
 
 class UserController {
 
@@ -34,19 +35,7 @@ class UserController {
       );
   }
 
-  static listUserAddresses = async (req, res) => {
-    const id = req.id;
-    try {
-      const user = await users.findById(id);
-      if (!user) {
-        return res.status(404).send({ message: "Usuário não encontrado" });
-      }
-      const addresses = user.addresses;
-      return res.status(200).send(addresses);
-    } catch (err) {
-      return res.status(500).send({ message: err.message });
-    }
-  };
+  
 
   static createUser = async (req, res) => {
     let user = new users(req.body);
@@ -81,24 +70,6 @@ class UserController {
     })
   }
 
-  static updateUserAddress =  async (req, res) => {
-    const id = req.id;
-    const addressId = req.params;
-    const address = req.body;
-    const user = await users.findById(id);
-    if (!user) {
-      return res.status(404).send({ message: 'Usuário não encontrado.' });
-    }
-    const addressIndex = user.addresses.findIndex(addr => addr._id == addressId);
-    if (addressIndex === -1) {
-      return res.status(404).send({ message: 'Endereço não encontrado.' });
-    }
-    user.addresses[addressIndex] = address;
-    await user.save();
-    return res.status(200).send(user);
-  };
-
-
   static deleteUser = (req, res) => {
     const id = req.params.id;
     users.findByIdAndDelete(id, (err) => {
@@ -120,7 +91,7 @@ class UserController {
       }
     })
   }
-  /* --------------------SELF GET AND PUT REQUESTS FOR USER TRYING TO IMPLEMENT------------------------- */
+  /* --------------------SELF GET AND PUT REQUESTS FOR USER ------------------------- */
 
   static listSelf = async (req, res) => {
     const id = req.id;
@@ -148,7 +119,6 @@ class UserController {
       }
     });
   }
-
 
   /* --------------------LOGIN------------------------- */
 
@@ -209,6 +179,97 @@ class UserController {
     res.clearCookie('jwt', { httpOnly: true, secure: true });
     res.sendStatus(204).json({ message: "Logout realizado com sucesso!" });;
   }
+
+    /* ADDRESS */
+
+    static listUserAddress = async (req, res) => {
+      const id = req.id;
+      try {
+        const user = await users.findById(id);
+        if (!user) {
+          return res.status(404).send({ message: "Usuário não encontrado" });
+        }
+        const addresses = user.addresses;
+        return res.status(200).send(addresses);
+      } catch (err) {
+        return res.status(500).send({ message: err.message });
+      }
+    };
+  
+    static createUserAddress = async (req, res) => {
+      const userId = req.id;
+      try {
+        const user = await users.findById(userId);
+        if (!user) {
+          return res.status(404).send({ message: "Usuário não encontrado" });
+        }
+        const address = new addresses({
+          userId: userId,
+          city: req.body.city,
+          state: req.body.state,
+          neighborhood: req.body.neighborhood,
+          street: req.body.street,
+          number: req.body.number,
+          zipcode: req.body.zipcode,
+          additionalInfo: req.body.additionalInfo,
+          mainAddress: req.body.mainAddress
+        });
+      
+        await address.save();
+        user.addresses.push(address._id);
+        await user.save();
+    
+        return res.status(200).send(address);
+      } catch (err) {
+        return res.status(500).send({ message: err.message });
+      }
+    }
+    
+    static updateUserAddress = async (req, res) => {
+      const id = req.id;
+      const addressId = req.params.id;
+      const update = req.body;
+      const user = await users.findById(id);
+      if (!user) {
+        return res.status(404).send({ message: 'Usuário não encontrado.' });
+      }
+      const addressIndex = user.addresses.findIndex(addr => addr._id == addressId);
+      if (addressIndex === -1) {
+        return res.status(404).send({ message: 'Endereço não encontrado.' });
+      }
+      const address = user.addresses[addressIndex];
+      address.city = update.city || address.city;
+      address.state = update.state || address.state;
+      address.neighborhood = update.neighborhood || address.neighborhood;
+      address.street = update.street || address.street;
+      address.number = update.number || address.number;
+      address.zipcode = update.zipcode || address.zipcode;
+      address.additionalInfo = update.additionalInfo || address.additionalInfo;
+      address.mainAddress = update.mainAddress || address.mainAddress;
+      await user.save();
+      return res.status(200).send(address);
+    };
+  
+    static deleteUserAddress = async (req, res) => {
+      const userId = req.id;
+      const addressId = req.params.id;
+      try {
+        const user = await users.findById(userId);
+        if (!user) {
+          return res.status(404).send({ message: 'Usuário não encontrado.' });
+        }
+        const addressIndex = user.addresses.findIndex(addr => addr._id == addressId);
+        if (addressIndex === -1) {
+          return res.status(404).send({ message: 'Endereço não encontrado.' });
+        }
+        user.addresses.splice(addressIndex, 1);
+        await user.save();
+    
+        return res.status(200).send({ message: 'Endereço removido com sucesso.' });
+      } catch (err) {
+        return res.status(500).send({ message: err.message });
+      }
+    };
 }
 
 export default UserController;

@@ -10,8 +10,10 @@ const router = express.Router();
 /* quando projetar rotas precisamos colocar no topo da mais especifica para a menos especifica, ou teremos erros de código
 */
 router
-  .get("/users/addresses", verifyJWT, UserController.updateUserAddress)
-  .put("/users/addresses/:addressId", verifyJWT, UserController.updateUserAddress)
+  .get("/users/me/addresses", verifyJWT, UserController.listUserAddress)
+  .post("/users/me/addresses", verifyJWT, UserController.createUserAddress)
+  .put("/users/me/addresses/:id", verifyJWT, UserController.updateUserAddress)
+  .delete("/users/me/addresses/:id", verifyJWT, UserController.deleteUserAddress)
   .get("/users/me", verifyJWT, UserController.listSelf)
   .put("/users/me", verifyJWT, UserController.updateSelf)
   .get("/users/search", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), UserController.listUserByEmail)

@@ -7,7 +7,11 @@ dotenv.config();
 
 const userData = { firstName: "JohnUser", lastName: "Doe", email: "john@testuser.com", password: "classified123", cellphone: "(19)9999999999" };
 const updatingUserData = { firstName: "JohnUserModified", lastName: "DoeModified", email: "john@user.com", password: "classified123", cellphone: "(19)9999999999" };
+const userAddress = { city: "Campinas", state: "São Paulo", neighborhood: "Taquaral", street: "Rua do lugar", number: "1234", zipcode: "13820000", additionalInfo: "APT 115", mainAddress: true};
+const userAddressUpdate = { city: "São Paulo", state: "São Paulo", neighborhood: "Tietê", street: "Rua do lugar", number: "1234", zipcode: "13820000", additionalInfo: "APT 120", mainAddress: true};
+
 let userDataResId;
+let userDataResAddressId;
 
 const getAccessToken = async (email, password) => {
   const loginRes = await request(app)
@@ -41,28 +45,33 @@ describe('Testing user routes', () => {
         .send(userData);
       expect(res.statusCode).toEqual(422);
     });
-    
+
     describe('Create address for user routes', () => {
 
-      it('given user is not logged in, should return sucessfully 201', async () => {
+      it('given user is not logged in, should return error 404', async () => {
         const res = await request(app)
-          .post('/users')
-          .send(userData);
-        userDataResId = res.body._id;
-        expect(res.statusCode).toEqual(201);
+          .post('/users/me/addresses')
+          .send(userAddress);
+        
+        expect(res.statusCode).toEqual(401);
       });
-  
-      it('given user email is already being used in another register, should not register and return error 422', async () => {
+
+      it('given user is logged in, should return sucessfully 200', async () => {
+        /* const accessTokenMe = await getAccessToken(userData.email, userData.password); */
+        const accessTokenMe = await getAccessToken(process.env.USER_SIMPLE_TEST, process.env.PASS_SIMPLE_TEST)
         const res = await request(app)
-          .post('/users')
-          .send(userData);
-        expect(res.statusCode).toEqual(422);
+          .post('/users/me/addresses')
+          .set('Authorization', `Bearer ${accessTokenMe}`)
+          .send(userAddress);
+
+         userDataResAddressId = res.body._id;
+        expect(res.statusCode).toEqual(200);
       });
-      
+
     })
-    
+
   })
- 
+
 
   describe('Get user routes', () => {
 
@@ -156,6 +165,27 @@ describe('Testing user routes', () => {
         expect(res.statusCode).toEqual(200);
       });
     })
+
+    describe('Get address for user routes', () => {
+
+      it('given user is not logged in, should return error 404', async () => {
+        const res = await request(app)
+          .get('/users/me/addresses')
+        
+        expect(res.statusCode).toEqual(401);
+      });
+
+      it('given user is logged in, should return sucessfully 200', async () => {
+        /* const accessTokenMe = await getAccessToken(userData.email, userData.password); */
+        const accessTokenMe = await getAccessToken(process.env.USER_SIMPLE_TEST, process.env.PASS_SIMPLE_TEST)
+        const res = await request(app)
+          .get('/users/me/addresses')
+          .set('Authorization', `Bearer ${accessTokenMe}`)
+
+        expect(res.statusCode).toEqual(200);
+      });
+    })
+    
   })
 
   describe('Update user route', () => {
@@ -184,6 +214,29 @@ describe('Testing user routes', () => {
         .send(updatingUserData);
       expect(res.statusCode).toEqual(200);
     });
+
+    describe('Update address for user routes', () => {
+
+      it('given user is not logged in, should return error 401', async () => {
+        const res = await request(app)
+          .put(`/users/me/addresses/${userDataResAddressId}`)
+          .send(userAddressUpdate)
+        
+        expect(res.statusCode).toEqual(401);
+      });
+
+      it('given user is logged in, should return sucessfully 200', async () => {
+        /* const accessTokenMe = await getAccessToken(userData.email, userData.password); */
+        const accessTokenMe = await getAccessToken(process.env.USER_SIMPLE_TEST, process.env.PASS_SIMPLE_TEST)
+        const res = await request(app)
+          .put(`/users/me/addresses/${userDataResAddressId}`)
+          .set('Authorization', `Bearer ${accessTokenMe}`)
+          .send(userAddressUpdate)
+
+        expect(res.statusCode).toEqual(200);
+      });
+    })
+
   })
 
   describe('Delete user route', () => {
@@ -207,5 +260,25 @@ describe('Testing user routes', () => {
         .set('Authorization', `Bearer ${accessTokenAdm}`);
       expect(res.statusCode).toEqual(200);
     });
+
+    describe('Delete address for user routes', () => {
+
+      it('given user is not logged in, should return error 401', async () => {
+        const res = await request(app)
+          .delete(`/users/me/addresses/${userDataResAddressId}`)
+        
+        expect(res.statusCode).toEqual(401);
+      });
+
+      it('given user is logged in, should return sucessfully 200', async () => {
+        /* const accessTokenMe = await getAccessToken(userData.email, userData.password); */
+        const accessTokenMe = await getAccessToken(process.env.USER_SIMPLE_TEST, process.env.PASS_SIMPLE_TEST)
+        const res = await request(app)
+          .delete(`/users/me/addresses/${userDataResAddressId}`)
+          .set('Authorization', `Bearer ${accessTokenMe}`)
+
+        expect(res.statusCode).toEqual(200);
+      });
+    })
   });
 });
