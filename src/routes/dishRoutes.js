@@ -8,6 +8,7 @@ const router = express.Router();
 
 router
   .get("/dishes", DishController.listDishesFrontend)
+  .get("/dishes/:menuId", DishController.listDishesFrontend)
   .get("/dishes/all",verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), DishController.listAllDishes)
   .get("/dishes/search",verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), DishController.listDishByType)
   .get("/dishes/:id",verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), DishController.listDishById)

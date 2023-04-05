@@ -47,6 +47,20 @@ class DishController {
       );
   }
 
+  static listDishesByMenuId = (req, res) => {
+    const menuId = req.params.menuId;
+    dishes.find({ menu: menuId })
+      .populate('menu', 'name')
+      .exec((err, dishes) => {
+        if (err) {
+          console.log('erro na listagem de pratos ->',err);
+          res.status(400).send({ message: `${err.message} - Não foi possível listar os pratos. ` });
+        } else {
+          res.status(200).send(dishes);
+        }
+      });
+  }
+
   static createDish = (req, res) => {
     let dish = new dishes(req.body);
     dish.save((err) => {
