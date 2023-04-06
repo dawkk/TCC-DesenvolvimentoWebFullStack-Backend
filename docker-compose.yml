@@ -12,6 +12,10 @@ services:
       - PORT=8000
       - ACCESS_TOKEN_SECRET=c5d92bcfa602eb707f98b74416e5bd90898155450d94aee30ce1193687135b680186de5ab8b0b08acf2109693410967088c43b8fff9e7ba9cfb7e3804dd399cd
       - REFRESH_TOKEN_SECRET=668d90adc989aba478757bcc759e50ece11a38b11266a9a991befc40fa13445f40e8ee9d385bb0ac58e16be16a3c6c41fc01305498d6ac385b1201f2017aa120
+      - USER_ADMIN_TEST=john@admin.com
+      - PASS_ADMIN_TEST=classified1985
+      - USER_SIMPLE_TEST=john@user.com
+      - PASS_SIMPLE_TEST=classified123
   
   mongo:
     image: mongo
