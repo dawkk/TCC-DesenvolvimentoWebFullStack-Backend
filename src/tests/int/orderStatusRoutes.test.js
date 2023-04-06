@@ -68,7 +68,6 @@ describe('Testing orders status routes', () => {
         .set('Authorization', `Bearer ${accessTokenAdm}`)
         .send(payload);
       orderDataResId = res.body._id;
-      console.log('orderDataResID sendo criado', orderDataResId)
       expect(res.statusCode).toEqual(201);
     });
 
@@ -123,7 +122,6 @@ describe('Testing orders status routes', () => {
       });
 
       it('given user is logged in and has authorization, should return a 200 and get the order status', async () => {
-        console.log('orderDataResID entrando em get id', orderDataResId)
         const res = await request(app)
           .get(`/orders/status/${orderDataResId}`)
           .set('Authorization', `Bearer ${accessTokenAdm}`)
