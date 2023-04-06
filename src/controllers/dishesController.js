@@ -1,24 +1,12 @@
 import dishes from "../models/dish.js";
-import { storage } from "../config/uploadImg.js";
-import { upload } from "../config/uploadImg.js";
+import upload from "../config/uploadImg.js"
+import fs from 'fs';
+
 
 
 class DishController {
 
-  static listDishesFrontend = (req, res) => {
-    dishes.find()
-      .populate('menu')
-      .exec((err, dishes) => {
-        if (err) {
-          res.status(400).send({ message: `${err.message} - Id do prato não encontrado. ` })
-        } else {
-          res.status(200).json(dishes)
-        }
-      }
-      )
-  }
-
-  static listAllDishes = (req, res) => {
+  static listDishes = (req, res) => {
     dishes.find()
       .populate('menu')
       .exec((err, dishes) => {
@@ -38,27 +26,13 @@ class DishController {
       .populate('menu', 'name')
       .exec((err, dishes) => {
         if (err) {
-          console.log('erro na listagem do prato ->',err)
+          console.log('erro na listagem do prato ->', err)
           res.status(400).send({ message: `${err.message} - Id do prato não encontrado. ` })
         } else {
           res.status(200).send(dishes)
         }
       }
       );
-  }
-
-  static listDishesByMenuId = (req, res) => {
-    const menuId = req.params.menuId;
-    dishes.find({ menu: menuId })
-      .populate('menu', 'name')
-      .exec((err, dishes) => {
-        if (err) {
-          console.log('erro na listagem de pratos ->',err);
-          res.status(400).send({ message: `${err.message} - Não foi possível listar os pratos. ` });
-        } else {
-          res.status(200).send(dishes);
-        }
-      });
   }
 
   static createDish = (req, res) => {
@@ -78,7 +52,7 @@ class DishController {
       if (!err) {
         res.status(200).send({ message: 'Prato atualizado com sucesso!' })
       } else {
-        console.log('erro no update do prato ->',err)
+        console.log('erro no update do prato ->', err)
         res.status(500).send({ message: err.message })
       }
     })
@@ -90,7 +64,7 @@ class DishController {
       if (!err) {
         res.status(200).send({ message: `Prato ${id} removido com sucesso!` })
       } else {
-        console.log('erro no delete do prato ->',err)
+        console.log('erro no delete do prato ->', err)
         res.status(500).send({ message: err.message })
       }
     })
@@ -108,6 +82,8 @@ class DishController {
     })
   }
 
+  /* IMAGE----------------------------------------------------- */
+
   static uploadDishImage = [
     upload.single("image"),
     (req, res, next) => {
@@ -121,8 +97,11 @@ class DishController {
         { image: req.file.filename },
         (err, dish) => {
           if (err) {
+            console.log('error message:', err)
             res.status(500).send({ message: err.message });
           } else if (!dish) {
+            console.log('error message:', dish)
+            console.log('error message:', err)
             res.status(404).send({ message: `Dish ${id} not found` });
           } else {
             res.status(200).send({ message: "Image uploaded successfully" });
@@ -139,11 +118,13 @@ class DishController {
         res.status(500).send({ message: err.message });
       } else if (!dish) {
         res.status(404).send({ message: `Dish ${id} not found` });
+      } else if (!dish.image || !fs.existsSync(`./src/temporary/uploads/${dish.image}`)) {
+        res.status(404).send({ message: `Image for dish ${id} not found` });
       } else {
-        res.sendFile(dish.image, { root: "./uploads/" });
+        res.sendFile(dish.image, { root: "./src/temporary/uploads/" });
       }
     });
-  };
+  }
 
 }
 
