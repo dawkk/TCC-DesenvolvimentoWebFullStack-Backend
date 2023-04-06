@@ -67,14 +67,12 @@ describe('Testing dish routes', () => {
           expect(res.statusCode).toEqual(401);
         });
 
-
         it('given user is logged in but doesnt have required authorizations, should return error 403', async () => {
           const res = await request(app)
             .get(`/dishes/${dishDataResId}`)
             .set('Authorization', `Bearer ${accessTokenSimpleUser}`)
           expect(res.statusCode).toEqual(403);
         });
-
 
         it('given user is logged in and has authorization, should return a 200 and get the dish', async () => {
           const res = await request(app)

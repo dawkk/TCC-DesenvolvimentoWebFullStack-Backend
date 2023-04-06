@@ -34,7 +34,6 @@ class DishController {
   static listDishById = (req, res) => {
     const id = req.params.id;
     dishes.findById(id)
-      /* Lembrar de deixar o nome do esquema em singular, por ex menus é o esquema porem abaixo usamos menu */
       .populate('menu', 'name')
       .exec((err, dishes) => {
         if (err) {
