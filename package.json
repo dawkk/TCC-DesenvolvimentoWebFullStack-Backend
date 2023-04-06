@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "node --trace-warnings --experimental-vm-modules node_modules/jest/bin/jest.js --verbose --detectOpenHandles",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose --forceExit",

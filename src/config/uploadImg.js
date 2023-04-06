@@ -1,12 +1,25 @@
 import multer from 'multer';
+import path from 'path';
 
-export const storage = multer.diskStorage({
+const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, '../temporary/uploads')
+    cb(null, './src/temporary/uploads')
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + file.originalname)
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
   }
 })
 
-export const upload = multer({ storage: storage })
+const upload = multer({ storage: storage })
+
+
+export const imageFilter = function(req, file, cb) {
+  // Accept images only
+  if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/)) {
+      req.fileValidationError = 'Only image files are allowed!';
+      return cb(new Error('Only image files are allowed!'), false);
+  }
+  cb(null, true);
+};
+
+export default upload;
