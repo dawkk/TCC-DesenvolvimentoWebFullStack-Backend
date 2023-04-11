@@ -113,7 +113,7 @@ class UserController {
     const id = req.id;
     const updatedFields = req.body;
     if (updatedFields.roles && updatedFields.roles.User) {
-      return res.status(400).send({ message: 'Cannot update User role.' });
+      return res.status(400).send({ message: 'Não autorizado, o usuário não pode alterar suas próprias permissões.' });
     }
   
     users.findByIdAndUpdate(id, { $set: updatedFields }, (err) => {
