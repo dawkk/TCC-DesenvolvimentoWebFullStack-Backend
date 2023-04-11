@@ -38,6 +38,11 @@ const orderSchema = new mongoose.Schema({
     required: true
   },
   totalPrice: { type: Number },
+  paymentMethod: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'paymentMethod',
+    required: true,
+  },
   dateOrdered: {
     type: Date,
     default: Date.now,

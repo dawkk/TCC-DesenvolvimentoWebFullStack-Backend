@@ -18,7 +18,7 @@ router
   .put("/users/me", verifyJWT, UserController.updateSelf)
   .get("/users/search", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), UserController.listUserByEmail)
   .get("/users/:id", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), UserController.listUserById)
-  .put("/users/:id", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), UserController.updateUser)
+  .put("/users/:id", verifyJWT, verifyRoles(ROLES_LIST.Admin), UserController.updateUser)
   .delete("/users/:id", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), UserController.deleteUser)
   .get("/users", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), UserController.listAllUsers)
   .post("/users", UserController.createUser)
