@@ -3,7 +3,8 @@ import dishes from "./dish.js";
 
 const menuSchema = new mongoose.Schema(
   {
-    name: {type: String, required: true}
+    name: {type: String, required: true, unique:true},
+    image: { type: String }
   }
 );
 
@@ -19,20 +20,19 @@ const updateDishes = async () => {
 const updateMenus = async () => {
   try {
     const count = await menus.countDocuments({});
-    const docs = await menus.find({});
     if (count === 0) {
       const initialMenus = [
         {
-          name: "Culinaria Brasileira"
+          name: "Entrada"
         },
         {
-          name: "Culinaria Italiana"
+          name: "Prato Principal"
         },
         {
-          name: "Culinaria Japonesa"
+          name: "Sobremesa"
         },
         {
-          name: "Culinaria Peruana"
+          name: "Menu Kids"
         }
       ];
       const docs = await menus.insertMany(initialMenus);

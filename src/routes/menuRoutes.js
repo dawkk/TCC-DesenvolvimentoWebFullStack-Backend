@@ -6,15 +6,13 @@ import ROLES_LIST from "../config/roles_list.js";
 
 const router = express.Router();
 
-router.route("/menus")
-  .get(MenuController.listMenus)
-  .post(verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor),MenuController.createMenu)
- 
-  router.route("/menus/:id")
-  .get(MenuController.listMenuById)
-  .put(verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor),MenuController.updateMenu)
-  .delete(verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), MenuController.deleteMenu)
-
-
+router
+  .post("/menus/:id/image", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), MenuController.uploadMenuImage)
+  .get("/menus/:id/image", MenuController.getMenuImage)
+  .put("/menus/:id", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), MenuController.updateMenu)
+  .delete("/menus/:id", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), MenuController.deleteMenu)
+  .get("/menus/:id", MenuController.listMenuById)
+  .post("/menus", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), MenuController.createMenu)
+  .get("/menus", MenuController.listMenus)
 
 export default router;
