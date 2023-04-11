@@ -2,47 +2,31 @@ import request from 'supertest';
 import app from '../../app.js';
 import * as dotenv from 'dotenv';
 import db from '../../config/dbConnect.js';
+import paymentMethods from '../../models/paymentMethod.js';
 
 dotenv.config();
 
+/* JUST TO REMEMBER, THE STATUS OF EVERY ORDER STARTS AS PENDING AS PER CONTROLLER */
+
 const userData = { firstName: "JohnUser", lastName: "Doe", email: "john@testuser.com", password: "classified123", cellphone: "(19)9999999999", addresses: ["642b04d412c0606bcb21cbb2", "642b4389946a19f9755928b6", "642b43ed0e0666e7e5c3ffa0", "642b44a09e9fd6fc4ebb505c"] };
 
-const payloadWithFaultyAddress = {
-  deliveryAddress: "642b04d412c0606bcb21ccc2",
-  cartItems: [
-    {
-      id: "640e7844fad834ccf1eb1362",
-      name: "Salada Simples",
-      price: 25,
-      quantity: 2,
-    },
-    {
-      id: "640e78b6fad834ccf1eb1370",
-      name: "Risoto de Frutos do Mar",
-      price: 58,
-      quantity: 2,
-    },
-  ],
-  totalPrice: 27.97,
-};
-const payloadModified = {
-  deliveryAddress: "642b4389946a19f9755928b6",
-  cartItems: [
-    {
-      id: "640e7844fad834ccf1eb1362",
-      name: "Salada Simples",
-      price: 35,
-      quantity: 3,
-    },
-    {
-      id: "640e78b6fad834ccf1eb1370",
-      name: "Risoto de Frutos do Mar",
-      price: 25,
-      quantity: 5,
-    },
-  ],
-  totalPrice: 95,
-};
+let orderDataResId;
+let orderWrongPathId;
+
+async function getPaymentMethodId(paymentMethodName) {
+  try {
+    const paymentMethod = await paymentMethods.findOne({ name: paymentMethodName });
+    if (!paymentMethod) {
+      throw new Error(`Payment method not found with name: ${paymentMethodName}`);
+    }
+    return paymentMethod._id.toString();
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+const paymentMethodDinheiro = await getPaymentMethodId("Dinheiro")
 
 const payload = {
   deliveryAddress: "642b04d412c0606bcb21cbb2",
@@ -60,11 +44,49 @@ const payload = {
       quantity: 2,
     },
   ],
+  paymentMethod:paymentMethodDinheiro,
   totalPrice: 27.97,
 };
 
-let orderDataResId;
-let orderWrongPathId;
+const payloadModified = {
+  deliveryAddress: "642b4389946a19f9755928b6",
+  cartItems: [
+    {
+      id: "640e7844fad834ccf1eb1362",
+      name: "Salada Simples",
+      price: 35,
+      quantity: 3,
+    },
+    {
+      id: "640e78b6fad834ccf1eb1370",
+      name: "Risoto de Frutos do Mar",
+      price: 25,
+      quantity: 5,
+    },
+  ],
+  paymentMethod:paymentMethodDinheiro,
+  totalPrice: 95,
+};
+
+const payloadWithFaultyAddress = {
+  deliveryAddress: "642b04d412c0606bcb21ccc2",
+  cartItems: [
+    {
+      id: "640e7844fad834ccf1eb1362",
+      name: "Salada Simples",
+      price: 25,
+      quantity: 2,
+    },
+    {
+      id: "640e78b6fad834ccf1eb1370",
+      name: "Risoto de Frutos do Mar",
+      price: 58,
+      quantity: 2,
+    },
+  ],
+  paymentMethod:paymentMethodDinheiro,
+  totalPrice: 27.97,
+};
 
 const getAccessToken = async (email, password) => {
   const loginRes = await request(app)

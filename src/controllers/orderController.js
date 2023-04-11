@@ -16,7 +16,7 @@ class OrderController {
     if (addressIndex === -1) {
       return res.status(404).send({ message: 'Endereço não encontrado.' });
     }
-    const { cartItems, totalPrice } = req.body;
+    const { cartItems, totalPrice, paymentMethod } = req.body;
     orderStatus.findOne({ status: "Pendente" }, (error, pendingStatus) => {
       if (error) {
         res.status(500).send({ message: `${error.message} - Falha ao criar pedido.` });
@@ -27,6 +27,7 @@ class OrderController {
           cartItems,
           status: pendingStatus._id,
           totalPrice,
+          paymentMethod
         });
         order.save((error, order) => {
           if (error) {

@@ -95,7 +95,7 @@ class UserController {
 
   static listSelf = async (req, res) => {
     const id = req.id;
-    users.findById(id, '-password')
+    users.findById(id, '-password -roles')
       .exec((err, user) => {
         if (err) {
           return res.status(400).send({ message: `${err.message} - Id do usuario não encontrado. ` })
@@ -111,11 +111,16 @@ class UserController {
 
   static updateSelf = async (req, res) => {
     const id = req.id;
-    users.findByIdAndUpdate(id, { $set: req.body }, (err) => {
+    const updatedFields = req.body;
+    if (updatedFields.roles && updatedFields.roles.User) {
+      return res.status(400).send({ message: 'Não autorizado, o usuário não pode alterar suas próprias permissões.' });
+    }
+  
+    users.findByIdAndUpdate(id, { $set: updatedFields }, (err) => {
       if (!err) {
-        return res.status(200).send({ message: 'usuario atualizado com sucesso!' })
+        return res.status(200).send({ message: 'usuario atualizado com sucesso!' });
       } else {
-        return res.status(500).send({ message: err.message })
+        return res.status(500).send({ message: err.message });
       }
     });
   }

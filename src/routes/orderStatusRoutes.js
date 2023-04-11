@@ -6,14 +6,12 @@ import ROLES_LIST from "../config/roles_list.js";
 
 const router = express.Router();
 
-router.route("/orderStatus")
-  .get(verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), orderStatusController.listOrdersStatus)
-  .post(verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor),orderStatusController.createOrderStatus)
- 
-  router.route("/orderStatus/:id")
-  .get(verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), orderStatusController.listOrderStatusById)
-  .put(verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee),orderStatusController.updateOrderStatus)
-  .delete(verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), orderStatusController.deleteOrderStatus)
+router
+  .get("/orderStatus/:id", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), orderStatusController.listOrderStatusById)
+  .put("/orderStatus/:id", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), orderStatusController.updateOrderStatus)
+  .delete("/orderStatus/:id", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), orderStatusController.deleteOrderStatus)
+  .get("/orderStatus", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), orderStatusController.listOrdersStatus)
+  .post("/orderStatus", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), orderStatusController.createOrderStatus)
 
 
 
