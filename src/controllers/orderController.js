@@ -55,6 +55,7 @@ class OrderController {
     const order = await orders.findById(req.params.id)
     .populate('userId')
     .populate('deliveryAddress')
+    .populate('paymentMethod')
     .populate('status')
 
     if (!order) {

@@ -6,8 +6,6 @@ import OrderController from "../controllers/orderController.js";
 
 const router = express.Router();
 
-router.use(verifyJWT)
-
 router
   .get("/orders/status/:id", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), OrderController.listOrderStatusById)
   .put("/orders/status/:id", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), OrderController.updateOrderStatus)

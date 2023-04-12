@@ -35,7 +35,7 @@ const checkoutSchema = new mongoose.Schema({
   totalPrice: { type: Number },
   paymentMethod: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'paymentMethod',
+    ref: 'paymentMethods',
     required: true,
   },
   expiresAt: {
@@ -46,6 +46,6 @@ const checkoutSchema = new mongoose.Schema({
 },
 { timestamps: true });
 
-const Checkout = mongoose.model('checkout', checkoutSchema);
+const checkouts = mongoose.model('checkouts', checkoutSchema);
 
-export default Checkout;
+export default checkouts;

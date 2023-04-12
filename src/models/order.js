@@ -40,7 +40,7 @@ const orderSchema = new mongoose.Schema({
   totalPrice: { type: Number },
   paymentMethod: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'paymentMethod',
+    ref: 'paymentMethods',
     required: true,
   },
   dateOrdered: {

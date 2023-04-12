@@ -183,7 +183,7 @@ class UserController {
     res.sendStatus(204).json({ message: "Logout realizado com sucesso!" });;
   }
 
-    /* ADDRESS */
+    /* -------------------------ADDRESS------------------------- */
 
     static listUserAddress = async (req, res) => {
       const id = req.id;
