@@ -1,17 +1,21 @@
 import menus from "../models/menu.js";
-import upload from "../config/uploadImg.js"
+import upload from "../config/uploadMenuImg.js"
 import fs from 'fs';
 
 class MenuController {
 
   static listMenus = (req, res) => {
-    menus.find((err, menus) => {
-      if(err) {
-        res.status(400).send({message: `${err.message} - Id do prato não encontrado. `})
-      } else {
-        res.status(200).json(menus)
-      }
-  })}
+    menus.find({})
+      .sort({ name: 1 })
+      .exec((err, menus) => {
+        if(err) {
+          res.status(400).send({message: `${err.message} - Id do prato não encontrado. `})
+        } else {
+          res.status(200).json(menus);
+        }
+      });
+  }
+  
 
   static listMenuById = (req, res) => {
     const id = req.params.id;
@@ -96,10 +100,10 @@ class MenuController {
         res.status(500).send({ message: err.message });
       } else if (!menu) {
         res.status(404).send({ message: `Menu ${id} not found` });
-      } else if (!menu.image || !fs.existsSync(`./src/temporary/uploads/${menu.image}`)) {
+      } else if (!menu.image || !fs.existsSync(`./src/temporary/uploads/menus/${menu.image}`)) {
         res.status(404).send({ message: `Image for menu ${id} not found` });
       } else {
-        res.sendFile(menu.image, { root: "./src/temporary/uploads/" });
+        res.sendFile(menu.image, { root: "./src/temporary/uploads/menus" });
       }
     });
   }

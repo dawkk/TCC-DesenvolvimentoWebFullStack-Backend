@@ -1,5 +1,6 @@
 import dishes from "../models/dish.js";
-import upload from "../config/uploadImg.js"
+import upload from "../config/uploadDishImg.js"
+import mongoose from "mongoose";
 import fs from 'fs';
 
 
@@ -48,7 +49,7 @@ class DishController {
   }
 
   static listDishesByMenuId = (req, res) => {
-    const menuId = req.params.menuId;
+    const menuId = mongoose.Types.ObjectId(req.params.menuId);
     dishes.find({ menu: menuId })
       .populate('menu', 'name')
       .exec((err, dishes) => {
@@ -110,7 +111,7 @@ class DishController {
 
   /* IMAGE----------------------------------------------------- */
 
-  static uploadDishImage = [
+  /* static uploadDishImage = [
     upload.single("image"),
     (req, res, next) => {
       const id = req.params.id;
@@ -118,6 +119,8 @@ class DishController {
         res.status(400).send({ message: "No image file provided" });
         return;
       }
+      console.log('this is req received on backend', req)
+      console.log('this is dish ID received on backend', id)
       dishes.findByIdAndUpdate(
         id,
         { image: req.file.filename },
@@ -130,10 +133,54 @@ class DishController {
             console.log('error message:', err)
             res.status(404).send({ message: `Dish ${id} not found` });
           } else {
-            res.status(200).send({ message: "Image uploaded successfully" });
+            res.status(200).send({ success: 'Image uploaded successfully!', image: req.file.filename });
           }
         }
       );
+    },
+  ];
+ */
+
+  static uploadDishImage = [
+    (req, res, next) => {
+      const id = req.params.id;
+      // Get the current dish information
+      dishes.findById(id, (err, dish) => {
+        if (err) {
+          res.status(500).send({ message: err.message });
+          return;
+        } else if (!dish) {
+          res.status(404).send({ message: `Dish ${id} not found` });
+          return;
+        }
+        // Delete the current image if exists
+        if (dish.image) {
+          fs.unlink(`./src/temporary/uploads/${dish.image}`, (err) => {
+            if (err) {
+              console.log("Error deleting current image:", err);
+            }
+          });
+        }
+        // Upload the new image
+        upload.single("image")(req, res, (err) => {
+          if (err) {
+            res.status(400).send({ message: "No image file provided" });
+            return;
+          }
+          // Update the dish with the new image filename
+          dishes.findByIdAndUpdate(
+            id,
+            { image: req.file.filename },
+            (err, dish) => {
+              if (err) {
+                res.status(500).send({ message: err.message });
+              } else {
+                res.status(200).send({ success: "Image uploaded successfully!", image: req.file.filename });
+              }
+            }
+          );
+        });
+      });
     },
   ];
 
@@ -144,10 +191,10 @@ class DishController {
         res.status(500).send({ message: err.message });
       } else if (!dish) {
         res.status(404).send({ message: `Dish ${id} not found` });
-      } else if (!dish.image || !fs.existsSync(`./src/temporary/uploads/${dish.image}`)) {
+      } else if (!dish.image || !fs.existsSync(`./src/temporary/uploads/dishes/${dish.image}`)) {
         res.status(404).send({ message: `Image for dish ${id} not found` });
       } else {
-        res.sendFile(dish.image, { root: "./src/temporary/uploads/" });
+        res.sendFile(dish.image, { root: "./src/temporary/uploads/dishes" });
       }
     });
   }
