@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import dishes from "./dish.js";
 
 const menuSchema = new mongoose.Schema(
   {
@@ -10,14 +9,40 @@ const menuSchema = new mongoose.Schema(
 
 const menus = mongoose.model('menus', menuSchema)
 
-const updateDishes = async () => {
-  const docs = await menus.find({});
-  if (docs.length > 0) {
-    await dishes.updateMany({}, { $set: { menu: docs[0]._id } });
+menus.countDocuments({}, async (error, count) => {
+  if (error) {
+    console.error(error);
+  } else {
+    if (count === 0) {
+      const initialMenus = [
+        {
+          name: "Entrada"
+        },
+        {
+          name: "Prato Principal"
+        },
+        {
+          name: "Sobremesa"
+        },
+        {
+          name: "Lanches"
+        }
+      ];
+      
+      menus.insertMany(initialMenus, (error, docs) => {
+        if (error) {
+          console.error(error);
+        } else {
+          console.log(`${docs.length} menus were successfully inserted into the database.`);
+        }
+      });
+    }
   }
-};
+});
 
-const updateMenus = async () => {
+export default menus;
+
+/* const updateMenus = async () => {
   try {
     const count = await menus.countDocuments({});
     if (count === 0) {
@@ -38,14 +63,9 @@ const updateMenus = async () => {
       const docs = await menus.insertMany(initialMenus);
       console.log(`${docs.length} menus were successfully inserted into the database.`);
     }
-    await updateDishes();
+    console.log(updateMenus)
   } catch (error) {
     console.error(error);
   }
 };
-
-updateMenus();
-console.log(updateMenus)
-
-
-export default menus;
+ */

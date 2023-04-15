@@ -24,14 +24,14 @@ dishes.countDocuments({}, async (error, count) => {
           description: "Alface americana, croutons crocantes, tomates-cereja frescos, parmesão ralado e molho ceasar.",
           price: 25,
           menu: "Entrada",
-          image: "image-1679521233614.jpg"
+          image: "image-1681566665102.jpg"
         },
         {
           title: "Risoto de Frutos do Mar",
           description: "Arroz arbóreo com camarão, lula, polvo e mariscos, temperados com azeite, alho, tomate e ervas.",
           price: 58,
           menu: "Prato Principal",
-          image: "image-1679521249097.jpg"
+          image: "image-1680382255168.jpg"
         },
         {
           title: "Churrasco Misto",
@@ -63,24 +63,34 @@ dishes.countDocuments({}, async (error, count) => {
         },
       ];
 
-      for (const dish of initialDishes) {
+      const promises = initialDishes.map(async (dish) => {
         try {
+          let menuId;
           const menu = await menus.findOne({ name: dish.menu });
-          if (menu) {
-            dish.menu = menu._id;
-          }
-        } catch (error) {
-          console.error(`Error while finding menu for dish ${dish.title}: ${error}`);
-        }
-      }
 
-      dishes.insertMany(initialDishes, (error, docs) => {
-        if (error) {
-          console.error(error);
-        } else {
-          console.log(`${docs.length} dishes were successfully inserted into the database.`);
+          // Wait for menu to be found before proceeding
+          while (!menu) {
+            console.log(`Waiting for menu ${dish.menu} to be created...`);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            menu = await menus.findOne({ name: dish.menu });
+          }
+
+          menuId = menu._id;
+
+          await dishes.create({
+            title: dish.title,
+            description: dish.description,
+            price: dish.price,
+            menu: menuId,
+            type: dish.type,
+            image: dish.image
+          });
+        } catch (error) {
+          console.error(`Error while creating dish ${dish.title}: ${error}`);
         }
       });
+
+      await Promise.all(promises);
     }
   }
 });
