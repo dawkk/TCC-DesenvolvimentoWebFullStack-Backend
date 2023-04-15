@@ -6,23 +6,24 @@ import OrderController from "../controllers/orderController.js";
 
 const router = express.Router();
 
-router.use(verifyJWT)
-
-router.route("/orders")
-  .get(verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), OrderController.listAllOrders)
-  .post(OrderController.createOrder)
-
-router.route("/orders/:id")
-  .get(verifyRoles(ROLES_LIST.User), OrderController.listOrderById)
-  .put(verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), OrderController.updateOrder)
-  .delete(verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), OrderController.deleteOrder)
+router
+  .get("/orders/status/:id", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), OrderController.listOrderStatusById)
+  .put("/orders/status/:id", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), OrderController.updateOrderStatus)
+  .delete("/orders/status/:id", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), OrderController.deleteOrderStatus)
+  .post("/orders/status", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), OrderController.createOrderStatus)
+  .get("/orders/status", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), OrderController.listOrdersStatus)
+  .get("/orders/me/:id", verifyJWT, OrderController.listSelfOrderById)
+  .get("/orders/me", verifyJWT, OrderController.listSelfOrders)
+  .get("/orders/:id", verifyJWT, OrderController.listOrderById)
+  .put("/orders/:id", verifyJWT, OrderController.updateOrder)
+  .delete("/orders/:id", verifyJWT, OrderController.deleteOrder)
+  .get("/orders", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.Employee), OrderController.listAllOrders)
+  .post("/orders", verifyJWT, OrderController.createOrder)
 
 /* router
   .get("/orders/:id", verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), OrderController.listOrdersByUserId)
   .get("/orders/totalsales", OrderController.listOrdersTotalSales) */
 
-
-  
 
 
 

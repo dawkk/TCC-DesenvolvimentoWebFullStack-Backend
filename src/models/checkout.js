@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const orderSchema = new mongoose.Schema({
+const checkoutSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'users',
@@ -32,24 +32,20 @@ const orderSchema = new mongoose.Schema({
       },
     },
   ],
-  status: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'orderStatus',
-    required: true
-  },
   totalPrice: { type: Number },
   paymentMethod: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'paymentMethods',
     required: true,
   },
-  dateOrdered: {
+  expiresAt: {
     type: Date,
+    expires: 60 * 60 * 24, // Expire after 24 hours
     default: Date.now,
   },
 },
 { timestamps: true });
 
-const orders = mongoose.model('orders', orderSchema);
+const checkouts = mongoose.model('checkouts', checkoutSchema);
 
-export default orders;
+export default checkouts;
