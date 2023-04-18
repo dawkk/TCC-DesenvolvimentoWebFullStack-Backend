@@ -192,8 +192,13 @@ class UserController {
         if (!user) {
           return res.status(404).send({ message: "Usuário não encontrado" });
         }
-        const addresses = user.addresses;
-        return res.status(200).send(addresses);
+        const addressIds = user.addresses; // Get the array of address object IDs
+        const addressesAll = await Promise.all(addressIds.map(async (addressId) => {
+          // Use the Mongoose model to fetch the complete address model using the object ID
+          const addressEach = await addresses.findById(addressId);
+          return addressEach; // Return the complete address model
+        }));
+        return res.status(200).send(addressesAll);
       } catch (err) {
         return res.status(500).send({ message: err.message });
       }

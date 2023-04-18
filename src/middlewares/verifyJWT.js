@@ -10,6 +10,8 @@ function verifyJWT(req, res, next) {
     if (!authHeader?.startsWith('Bearer ')) return res.sendStatus(401);
     token = authHeader.split(' ')[1];
   }
+ /*  console.log('This is token from verifyJWT',token)
+  console.log('This is requisition cookie jwt from verifyJWT', req.cookies.jwt) */
   const secret = process.env.ACCESS_TOKEN_SECRET;
   jwt.verify(
     token,
