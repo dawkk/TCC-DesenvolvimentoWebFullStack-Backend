@@ -37,7 +37,7 @@ const orderSchema = new mongoose.Schema({
     ref: 'orderStatus',
     required: true
   },
-  totalPrice: { type: Number },
+  totalAmount: { type: Number },
   paymentMethod: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'paymentMethods',

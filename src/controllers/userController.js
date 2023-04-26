@@ -95,7 +95,7 @@ class UserController {
 
   static listSelf = async (req, res) => {
     const id = req.id;
-    users.findById(id, '-password -roles')
+    users.findById(id, '-password')
       .exec((err, user) => {
         if (err) {
           return res.status(400).send({ message: `${err.message} - Id do usuario não encontrado. ` })
@@ -147,7 +147,7 @@ class UserController {
           "UserInfo": {
             "id": findUser._id,
             "roles": findUser.roles
-          }
+          },
         };
         const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '2h' });
         const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '1d' });
@@ -155,7 +155,7 @@ class UserController {
         findUser.refreshToken = refreshToken;
         const updateUser = await findUser.save();
         updateUser;
-        return res.cookie('jwt', accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }).status(200).json({ message: "Autenticação realizada com sucesso!", accessToken, refreshToken, roles, id });
+        return res.cookie('jwt', accessToken, { httpOnly: true, maxAge: 2 * 60 * 60 * 1000 }).status(200).json({ message: "Autenticação realizada com sucesso!", accessToken, refreshToken, roles, id });
 
       } catch (err) {
         return res.status(401).json(err.message);
@@ -192,11 +192,10 @@ class UserController {
         if (!user) {
           return res.status(404).send({ message: "Usuário não encontrado" });
         }
-        const addressIds = user.addresses; // Get the array of address object IDs
+        const addressIds = user.addresses; 
         const addressesAll = await Promise.all(addressIds.map(async (addressId) => {
-          // Use the Mongoose model to fetch the complete address model using the object ID
           const addressEach = await addresses.findById(addressId);
-          return addressEach; // Return the complete address model
+          return addressEach;
         }));
         return res.status(200).send(addressesAll);
       } catch (err) {

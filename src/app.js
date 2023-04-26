@@ -9,8 +9,16 @@ db.once("open", () => {
   console.log("conexão com o banco feita com sucesso")
 })
 
+const port = process.env.FRONT_PORT;
+const corsOptions = {
+  origin: `http://localhost:${port}`, // replace with your frontend origin
+  credentials: true
+}
+
+
+
 const app = express();
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

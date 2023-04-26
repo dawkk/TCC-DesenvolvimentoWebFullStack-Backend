@@ -45,7 +45,7 @@ const payload = {
     },
   ],
   paymentMethod:paymentMethodDinheiro,
-  totalPrice: 27.97,
+  totalAmount: 27.97,
 };
 
 const payloadModified = {
@@ -65,7 +65,7 @@ const payloadModified = {
     },
   ],
   paymentMethod:paymentMethodDinheiro,
-  totalPrice: 95,
+  totalAmount: 95,
 };
 
 const payloadWithFaultyAddress = {
@@ -85,7 +85,7 @@ const payloadWithFaultyAddress = {
     },
   ],
   paymentMethod:paymentMethodDinheiro,
-  totalPrice: 27.97,
+  totalAmount: 27.97,
 };
 
 const getAccessToken = async (email, password) => {

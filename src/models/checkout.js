@@ -5,6 +5,7 @@ const checkoutSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'users',
     required: true,
+    unique: true
   },
   deliveryAddress: {
     type: mongoose.Schema.Types.ObjectId,
@@ -32,11 +33,10 @@ const checkoutSchema = new mongoose.Schema({
       },
     },
   ],
-  totalPrice: { type: Number },
+  totalAmount: { type: Number },
   paymentMethod: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'paymentMethods',
-    required: true,
   },
   expiresAt: {
     type: Date,

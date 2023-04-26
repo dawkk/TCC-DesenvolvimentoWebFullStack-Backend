@@ -7,9 +7,13 @@ class CheckoutController {
   static createCheckout = async (req, res) => {
     try {
       const userId = req.id;
-      const addressReq = req.body.deliveryAddress;
+      const addressReq = req.body.payload.deliveryAddress;
       const user = await users.findById(userId);
-    
+
+      console.log('backend user id', userId)
+      console.log('backend addressreq', addressReq)
+      console.log('backend whole req', req)
+
       if (!user) {
         return res.status(404).send({ message: 'Usuário não encontrado.' });
       }
@@ -17,13 +21,13 @@ class CheckoutController {
       if (addressIndex === -1) {
         return res.status(404).send({ message: 'Endereço não encontrado.' });
       }
-      const { cartItems, totalPrice, paymentMethod } = req.body;
+      const { cartItems, totalAmount, paymentMethod } = req.body;
 
       const checkout = new checkouts({
         userId,
         deliveryAddress: user.addresses[addressIndex],
         cartItems,
-        totalPrice,
+        totalAmount,
         paymentMethod
       });
       const savedCheckout = await checkout.save();
@@ -35,7 +39,7 @@ class CheckoutController {
 
   static listAllCheckouts = async (req, res) => {
     const checkoutFind = await checkouts.find()
-    .sort({ 'expiresAt': -1 });
+      .sort({ 'expiresAt': -1 });
     if (!checkoutFind) {
       res.status(500).json({ message: "Erro ao tentar listar checkout" })
     } else {
@@ -45,19 +49,22 @@ class CheckoutController {
 
   static listCheckoutById = async (req, res) => {
     const checkout = await checkouts.findById(req.params.id)
-    .populate('userId')
-    .populate('deliveryAddress')
-    .populate('paymentMethod')
-    
+      .populate('userId')
+      .populate('deliveryAddress')
+      .populate('paymentMethod')
+
     if (!checkout) {
       res.status(500).json({ message: "Erro ao tentar listar checkout" })
     } else {
       res.send(checkout);
     }
   };
-  
+
   static updateCheckoutById = async (req, res) => {
     const id = req.params.id;
+
+    console.log('backend req body', req.body)
+    console.log('backend req', req)
     checkouts.findByIdAndUpdate(id, { $set: req.body }, (err) => {
       if (!err) {
         res.status(200).send({ message: 'Checkout foi atualizado com sucesso!' })
@@ -83,7 +90,10 @@ class CheckoutController {
   static listSelfCheckouts = async (req, res) => {
     const id = req.id;
     try {
-      const checkoutFind = await checkouts.find({ userId: id})
+      const checkoutFind = await checkouts.find({ userId: id })
+        .populate('userId')
+        .populate('deliveryAddress')
+        .populate('paymentMethod')
         .sort({ 'expiresAt': -1 })
       if (!checkoutFind || checkoutFind.length === 0) {
         res.status(404).json({ message: "Checkouts não encontrados para este usuario" });
@@ -117,7 +127,7 @@ class CheckoutController {
       const userId = req.id;
       const updatedData = req.body;
       const checkout = await checkouts.findById(checkoutId);
-      
+
       if (!checkout) {
         return res.status(404).send({ message: 'Checkout não encontrado.' });
       }
@@ -134,7 +144,7 @@ class CheckoutController {
   static deleteSelfCheckout = async (req, res) => {
     const id = req.params.id;
     const userId = req.id;
-  
+
     try {
       const checkout = await checkouts.findById(id);
       if (!checkout) {
@@ -149,7 +159,7 @@ class CheckoutController {
       res.status(500).send({ message: err.message });
     }
   }
-  
+
 
 }
 
