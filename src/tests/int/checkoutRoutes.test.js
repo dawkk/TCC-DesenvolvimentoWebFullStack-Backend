@@ -26,20 +26,15 @@ async function getPaymentMethodId(paymentMethodName) {
 
 const paymentMethodDinheiro = await getPaymentMethodId("Dinheiro")
 
+
 const payload = {
   deliveryAddress: "642b04d412c0606bcb21cbb2",
   cartItems: [
     {
-      id: "640e7844fad834ccf1eb1362",
-      name: "Salada Simples",
-      price: 25,
-      quantity: 2,
+      _id: "6457d8dc0fef62c68505ea5b",
     },
     {
-      id: "640e78b6fad834ccf1eb1370",
-      name: "Risoto de Frutos do Mar",
-      price: 58,
-      quantity: 2,
+      _id: "6457d9a80fef62c68505ea5e",
     },
   ],
   paymentMethod: paymentMethodDinheiro,
@@ -50,16 +45,10 @@ const payloadModified = {
   deliveryAddress: "642b4389946a19f9755928b6",
   cartItems: [
     {
-      id: "640e7844fad834ccf1eb1362",
-      name: "Salada Simples",
-      price: 35,
-      quantity: 3,
+      _id: "6457d8dc0fef62c68505ea5b",
     },
     {
-      id: "640e78b6fad834ccf1eb1370",
-      name: "Risoto de Frutos do Mar",
-      price: 25,
-      quantity: 5,
+      _id: "6457d9a80fef62c68505ea5e",
     },
   ],
   paymentMethod: paymentMethodDinheiro,
@@ -70,21 +59,16 @@ const payloadWithFaultyAddress = {
   deliveryAddress: "642b04d412c0606bcb21ccc2",
   cartItems: [
     {
-      id: "640e7844fad834ccf1eb1362",
-      name: "Salada Simples",
-      price: 25,
-      quantity: 2,
+      _id: "6457d8dc0fef62c68505ea5b",
     },
     {
-      id: "640e78b6fad834ccf1eb1370",
-      name: "Risoto de Frutos do Mar",
-      price: 58,
-      quantity: 2,
+      _id: "6457d9a80fef62c68505ea5e",
     },
   ],
   paymentMethod: paymentMethodDinheiro,
   totalAmount: 27.97,
 };
+
 
 const getAccessToken = async (email, password) => {
   const loginRes = await request(app)

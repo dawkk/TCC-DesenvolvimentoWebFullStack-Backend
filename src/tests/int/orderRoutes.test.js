@@ -28,65 +28,7 @@ async function getPaymentMethodId(paymentMethodName) {
 
 const paymentMethodDinheiro = await getPaymentMethodId("Dinheiro")
 
-const payload = {
-  deliveryAddress: "642b04d412c0606bcb21cbb2",
-  cartItems: [
-    {
-      id: "640e7844fad834ccf1eb1362",
-      name: "Salada Simples",
-      price: 25,
-      quantity: 2,
-    },
-    {
-      id: "640e78b6fad834ccf1eb1370",
-      name: "Risoto de Frutos do Mar",
-      price: 58,
-      quantity: 2,
-    },
-  ],
-  paymentMethod:paymentMethodDinheiro,
-  totalAmount: 27.97,
-};
-
-const payloadModified = {
-  deliveryAddress: "642b4389946a19f9755928b6",
-  cartItems: [
-    {
-      id: "640e7844fad834ccf1eb1362",
-      name: "Salada Simples",
-      price: 35,
-      quantity: 3,
-    },
-    {
-      id: "640e78b6fad834ccf1eb1370",
-      name: "Risoto de Frutos do Mar",
-      price: 25,
-      quantity: 5,
-    },
-  ],
-  paymentMethod:paymentMethodDinheiro,
-  totalAmount: 95,
-};
-
-const payloadWithFaultyAddress = {
-  deliveryAddress: "642b04d412c0606bcb21ccc2",
-  cartItems: [
-    {
-      id: "640e7844fad834ccf1eb1362",
-      name: "Salada Simples",
-      price: 25,
-      quantity: 2,
-    },
-    {
-      id: "640e78b6fad834ccf1eb1370",
-      name: "Risoto de Frutos do Mar",
-      price: 58,
-      quantity: 2,
-    },
-  ],
-  paymentMethod:paymentMethodDinheiro,
-  totalAmount: 27.97,
-};
+/* LOGIN MOCK */
 
 const getAccessToken = async (email, password) => {
   const loginRes = await request(app)
@@ -97,6 +39,56 @@ const getAccessToken = async (email, password) => {
 
 const accessTokenSimpleUser = await getAccessToken(userData.email, userData.password);
 const accessTokenAdm = await getAccessToken(process.env.USER_ADMIN_TEST, process.env.PASS_ADMIN_TEST);
+
+/* ORDER ITEMS MOCK */
+
+
+const payload = {
+  deliveryAddress: "642b04d412c0606bcb21cbb2",
+  cartItems: [
+    {
+      _id: "6457d8dc0fef62c68505ea5b",
+    },
+    {
+      _id: "6457d9a80fef62c68505ea5e",
+    },
+  ],
+  paymentMethod: paymentMethodDinheiro,
+  totalAmount: 27.97,
+};
+
+const payloadModified = {
+  deliveryAddress: "642b4389946a19f9755928b6",
+  cartItems: [
+    {
+      _id: "6457d8dc0fef62c68505ea5b",
+    },
+    {
+      _id: "6457d9a80fef62c68505ea5e",
+    },
+  ],
+  paymentMethod: paymentMethodDinheiro,
+  totalAmount: 95,
+};
+
+const payloadWithFaultyAddress = {
+  deliveryAddress: "642b04d412c0606bcb21ccc2",
+  cartItems: [
+    {
+      _id: "6457d8dc0fef62c68505ea5b",
+    },
+    {
+      _id: "6457d9a80fef62c68505ea5e",
+    },
+  ],
+  paymentMethod: paymentMethodDinheiro,
+  totalAmount: 27.97,
+};
+
+
+
+/*  TESTS */
+
 
 afterAll(async () => {
   await db.close();
@@ -114,7 +106,7 @@ describe('Testing orders routes', () => {
       expect(res.statusCode).toEqual(401);
     });
 
-    it('given user is logged in, should return error 404', async () => {
+    it('given user is logged in but has wrong address number id, should return error 404', async () => {
       const accessTokenMe = await getAccessToken(process.env.USER_SIMPLE_TEST, process.env.PASS_SIMPLE_TEST)
       const res = await request(app)
         .post('/orders')
@@ -130,6 +122,8 @@ describe('Testing orders routes', () => {
         .post('/orders')
         .set('Authorization', `Bearer ${accessTokenMe}`)
         .send(payload);
+
+        console.log('this is response from test create order routes', res.body)
       orderDataResId = res.body._id;
       expect(res.statusCode).toEqual(201);
     });

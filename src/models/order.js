@@ -12,25 +12,7 @@ const orderSchema = new mongoose.Schema({
     required: true,
   },
   cartItems: [
-    {
-      id: {
-        type: String,
-        required: true,
-      },
-      name: {
-        type: String,
-        required: true,
-      },
-      price: {
-        type: Number,
-        required: true,
-      },
-      quantity: {
-        type: Number,
-        required: true,
-        default: 1,
-      },
-    },
+    { type: mongoose.Schema.Types.ObjectId, ref: 'orderItems' }
   ],
   status: {
     type: mongoose.Schema.Types.ObjectId,
@@ -48,7 +30,7 @@ const orderSchema = new mongoose.Schema({
     default: Date.now,
   },
 },
-{ timestamps: true });
+  { timestamps: true });
 
 const orders = mongoose.model('orders', orderSchema);
 

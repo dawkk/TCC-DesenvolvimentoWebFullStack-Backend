@@ -5,6 +5,8 @@ import menus from "./menuRoutes.js"
 import orders from "./orderRoutes.js"
 import paymentMethods from "./paymentMethodRoutes.js";
 import checkouts from "./checkoutRoutes.js"
+import orderItems from "./orderItemsRoutes.js"
+
 
 const routes = (app) => {
   app.route('/').get((req, res) => {
@@ -18,7 +20,8 @@ const routes = (app) => {
     users,
     orders,
     paymentMethods,
-    checkouts
+    checkouts,
+    orderItems
   )
 }
 

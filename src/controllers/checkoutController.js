@@ -1,4 +1,5 @@
 import checkouts from "../models/checkout.js";
+import orderItems from "../models/orderItems.js";
 import users from "../models/user.js";
 
 
@@ -7,12 +8,8 @@ class CheckoutController {
   static createCheckout = async (req, res) => {
     try {
       const userId = req.id;
-      const addressReq = req.body.payload.deliveryAddress;
+      const addressReq = req.body.deliveryAddress;
       const user = await users.findById(userId);
-
-      console.log('backend user id', userId)
-      console.log('backend addressreq', addressReq)
-      console.log('backend whole req', req)
 
       if (!user) {
         return res.status(404).send({ message: 'Usuário não encontrado.' });
@@ -23,10 +20,18 @@ class CheckoutController {
       }
       const { cartItems, totalAmount, paymentMethod } = req.body;
 
+      let cartItemIds = [];
+      if (cartItems) {
+        cartItemIds = cartItems.map((item) => item._id);
+        const existingOrderItems = await orderItems.find({ _id: { $in: cartItemIds } });
+        if (existingOrderItems.length !== cartItemIds.length) {
+          return res.status(400).send({ message: 'Um ou mais itens do carrinho não existem.' });
+        }
+      }
       const checkout = new checkouts({
         userId,
         deliveryAddress: user.addresses[addressIndex],
-        cartItems,
+        cartItems: cartItemIds,
         totalAmount,
         paymentMethod
       });

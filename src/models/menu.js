@@ -41,31 +41,3 @@ menus.countDocuments({}, async (error, count) => {
 });
 
 export default menus;
-
-/* const updateMenus = async () => {
-  try {
-    const count = await menus.countDocuments({});
-    if (count === 0) {
-      const initialMenus = [
-        {
-          name: "Entrada"
-        },
-        {
-          name: "Prato Principal"
-        },
-        {
-          name: "Sobremesa"
-        },
-        {
-          name: "Menu Kids"
-        }
-      ];
-      const docs = await menus.insertMany(initialMenus);
-      console.log(`${docs.length} menus were successfully inserted into the database.`);
-    }
-    console.log(updateMenus)
-  } catch (error) {
-    console.error(error);
-  }
-};
- */
