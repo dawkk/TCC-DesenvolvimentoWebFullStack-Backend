@@ -9,7 +9,7 @@ const userAddressessSchema = new mongoose.Schema({
   number: { type: Number },
   zipcode: { type: Number },
   additionalInfo: { type: String },
-  mainAddress: { type: Boolean }
+  mainAddress: { type: Boolean, default: false }
 });
 
 const addresses = mongoose.model('addresses', userAddressessSchema);

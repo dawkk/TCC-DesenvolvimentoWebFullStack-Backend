@@ -12,6 +12,7 @@ const router = express.Router();
 router
   .get("/users/me/addresses", verifyJWT, UserController.listUserAddress)
   .post("/users/me/addresses", verifyJWT, UserController.createUserAddress)
+  .get("/users/me/addresses/:id", verifyJWT, UserController.listUserAddressById)
   .put("/users/me/addresses/:id", verifyJWT, UserController.updateUserAddress)
   .delete("/users/me/addresses/:id", verifyJWT, UserController.deleteUserAddress)
   .get("/users/me", verifyJWT, UserController.listSelf)

@@ -35,27 +35,48 @@ class UserController {
       );
   }
 
-  
-
   static createUser = async (req, res) => {
-    let user = new users(req.body);
-    const findUser = await users.findOne({ email: req.body.email });
+    const { firstName, lastName, email, password, cellphone, city, state, neighborhood, street, number, zipcode, additionalInfo } = req.body;
+
+    const findUser = await users.findOne({ email });
     if (findUser) {
       return res.status(422).send({ message: "Por favor, utilize outro e-mail!" });
-    } else {
+    }
+
+    try {
       const salt = await bcrypt.genSalt(12);
-      const passwordHash = await bcrypt.hash(req.body.password, salt);
-      user.password = passwordHash;
-      user.addresses.push(req.body.address);
-      user.save((err) => {
-        if (err) {
-          return res.status(500).send({ message: `${err.message} - Falha ao cadastrar usuario.` })
-        } else {
-          const objUser = user.toJSON();
-          delete objUser.password;
-          return res.status(201).send(objUser);
-        }
-      })
+      const passwordHash = await bcrypt.hash(password, salt);
+      const user = new users({
+        firstName,
+        lastName,
+        cellphone,
+        email,
+        password: passwordHash
+      });
+
+      const savedUser = await user.save();
+
+      const userAddress = new addresses({
+        userId: savedUser._id,
+        city,
+        state,
+        neighborhood,
+        street,
+        number,
+        zipcode,
+        additionalInfo
+      });
+
+      await userAddress.save();
+      savedUser.addresses.push(userAddress._id);
+      await savedUser.save();
+
+      const objUser = savedUser.toJSON();
+      delete objUser.password;
+
+      return res.status(201).send(objUser);
+    } catch (err) {
+      return res.status(500).send({ message: `${err.message} - Falha ao cadastrar usuario.` });
     }
   }
 
@@ -112,10 +133,7 @@ class UserController {
   static updateSelf = async (req, res) => {
     const id = req.id;
     const updatedFields = req.body;
-    if (updatedFields.roles && updatedFields.roles.User) {
-      return res.status(400).send({ message: 'Não autorizado, o usuário não pode alterar suas próprias permissões.' });
-    }
-  
+
     users.findByIdAndUpdate(id, { $set: updatedFields }, (err) => {
       if (!err) {
         return res.status(200).send({ message: 'usuario atualizado com sucesso!' });
@@ -183,100 +201,123 @@ class UserController {
     res.sendStatus(204).json({ message: "Logout realizado com sucesso!" });;
   }
 
-    /* -------------------------ADDRESS------------------------- */
+  /* -------------------------ADDRESS------------------------- */
 
-    static listUserAddress = async (req, res) => {
-      const id = req.id;
-      try {
-        const user = await users.findById(id);
-        if (!user) {
-          return res.status(404).send({ message: "Usuário não encontrado" });
-        }
-        const addressIds = user.addresses; 
-        const addressesAll = await Promise.all(addressIds.map(async (addressId) => {
-          const addressEach = await addresses.findById(addressId);
-          return addressEach;
-        }));
-        return res.status(200).send(addressesAll);
-      } catch (err) {
-        return res.status(500).send({ message: err.message });
-      }
-    };
-  
-    static createUserAddress = async (req, res) => {
-      const userId = req.id;
-      try {
-        const user = await users.findById(userId);
-        if (!user) {
-          return res.status(404).send({ message: "Usuário não encontrado" });
-        }
-        const address = new addresses({
-          userId: userId,
-          city: req.body.city,
-          state: req.body.state,
-          neighborhood: req.body.neighborhood,
-          street: req.body.street,
-          number: req.body.number,
-          zipcode: req.body.zipcode,
-          additionalInfo: req.body.additionalInfo,
-          mainAddress: req.body.mainAddress
-        });
-      
-        await address.save();
-        user.addresses.push(address._id);
-        await user.save();
-    
-        return res.status(200).send(address);
-      } catch (err) {
-        return res.status(500).send({ message: err.message });
-      }
-    }
-    
-    static updateUserAddress = async (req, res) => {
-      const id = req.id;
-      const addressId = req.params.id;
-      const update = req.body;
+  static listUserAddress = async (req, res) => {
+    const id = req.id;
+    try {
       const user = await users.findById(id);
       if (!user) {
-        return res.status(404).send({ message: 'Usuário não encontrado.' });
+        return res.status(404).send({ message: "Usuário não encontrado" });
       }
-      const addressIndex = user.addresses.findIndex(addr => addr._id == addressId);
-      if (addressIndex === -1) {
+      const addressIds = user.addresses;
+      const addressesAll = await Promise.all(addressIds.map(async (addressId) => {
+        const addressEach = await addresses.findById(addressId);
+        return addressEach;
+      }));
+      return res.status(200).send(addressesAll);
+    } catch (err) {
+      return res.status(500).send({ message: err.message });
+    }
+  };
+
+  static listUserAddressById = async (req, res) => {
+    const addressId = req.params.id;
+    const findAddress = await addresses.findById(addressId)
+      .exec((err, address) => {
+
+        if (err) {
+          return res.status(400).send({ message: `${err.message} - Id do endereço não encontrado. ` })
+        } else {
+          return res.status(200).send(address)
+        }
+      }
+      );
+  }
+
+
+  static createUserAddress = async (req, res) => {
+    const userId = req.id;
+    try {
+      const user = await users.findById(userId);
+      if (!user) {
+        return res.status(404).send({ message: "Usuário não encontrado" });
+      }
+      const address = new addresses({
+        userId: userId,
+        city: req.body.city,
+        state: req.body.state,
+        neighborhood: req.body.neighborhood,
+        street: req.body.street,
+        number: req.body.number,
+        zipcode: req.body.zipcode,
+        additionalInfo: req.body.additionalInfo,
+        mainAddress: req.body.mainAddress
+      });
+
+      await address.save();
+      user.addresses.push(address._id);
+      await user.save();
+
+      return res.status(200).send(address);
+    } catch (err) {
+      return res.status(500).send({ message: err.message });
+    }
+  }
+
+  static updateUserAddress = async (req, res) => {
+    const addressId = req.params.id;
+    const loggedUserId = req.id;
+
+    try {
+      const address = await addresses.findById(addressId);
+      if (!address) {
         return res.status(404).send({ message: 'Endereço não encontrado.' });
       }
-      const address = user.addresses[addressIndex];
-      address.city = update.city || address.city;
-      address.state = update.state || address.state;
-      address.neighborhood = update.neighborhood || address.neighborhood;
-      address.street = update.street || address.street;
-      address.number = update.number || address.number;
-      address.zipcode = update.zipcode || address.zipcode;
-      address.additionalInfo = update.additionalInfo || address.additionalInfo;
-      address.mainAddress = update.mainAddress || address.mainAddress;
-      await user.save();
-      return res.status(200).send(address);
-    };
-  
-    static deleteUserAddress = async (req, res) => {
-      const userId = req.id;
-      const addressId = req.params.id;
-      try {
-        const user = await users.findById(userId);
-        if (!user) {
-          return res.status(404).send({ message: 'Usuário não encontrado.' });
-        }
-        const addressIndex = user.addresses.findIndex(addr => addr._id == addressId);
-        if (addressIndex === -1) {
-          return res.status(404).send({ message: 'Endereço não encontrado.' });
-        }
-        user.addresses.splice(addressIndex, 1);
-        await user.save();
-    
-        return res.status(200).send({ message: 'Endereço removido com sucesso.' });
-      } catch (err) {
-        return res.status(500).send({ message: err.message });
+
+      const userId = address.userId;
+      if (userId !== loggedUserId) {
+        return res.status(403).send({ message: 'Você não tem permissão para atualizar este endereço.' });
       }
-    };
+
+      await addresses.findByIdAndUpdate(addressId, { $set: req.body });
+
+      return res.status(200).send({ message: 'Endereço atualizado com sucesso!' });
+    } catch (err) {
+      return res.status(500).send({ message: err.message });
+    }
+  };
+
+
+  static deleteUserAddress = async (req, res) => {
+    const addressId = req.params.id;
+    const loggedUserId = req.id;
+
+    try {
+      const address = await addresses.findById(addressId);
+      if (!address) {
+        return res.status(404).send({ message: 'Endereço não encontrado.' });
+      }
+
+      const userId = address.userId;
+      if (userId !== loggedUserId) {
+        return res.status(403).send({ message: 'Você não tem permissão para atualizar este endereço.' });
+      }
+
+      const user = await users.findById(loggedUserId);
+      const addressIndex = user.addresses.findIndex(addr => addr._id == addressId);
+      user.addresses.splice(addressIndex, 1);
+      await user.save();
+
+      await addresses.findByIdAndDelete(addressId)
+      return res.status(200).send({ message: 'Endereço atualizado com sucesso!' });
+    } catch (err) {
+      return res.status(500).send({ message: err.message });
+    }
+  };
+
+  /* OAUTH */
+
 }
 
 export default UserController;

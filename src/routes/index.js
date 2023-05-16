@@ -6,6 +6,7 @@ import orders from "./orderRoutes.js"
 import paymentMethods from "./paymentMethodRoutes.js";
 import checkouts from "./checkoutRoutes.js"
 import orderItems from "./orderItemsRoutes.js"
+import authRouter from "./authRoutes.js";
 
 
 const routes = (app) => {
@@ -15,6 +16,7 @@ const routes = (app) => {
 
   app.use(
     express.json(),
+    authRouter,
     dishes,
     menus,
     users,
