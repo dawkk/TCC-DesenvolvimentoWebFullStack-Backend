@@ -67,9 +67,6 @@ class CheckoutController {
 
   static updateCheckoutById = async (req, res) => {
     const id = req.params.id;
-
-    console.log('backend req body', req.body)
-    console.log('backend req', req)
     checkouts.findByIdAndUpdate(id, { $set: req.body }, (err) => {
       if (!err) {
         res.status(200).send({ message: 'Checkout foi atualizado com sucesso!' })

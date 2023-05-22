@@ -19,7 +19,8 @@ const userSchema = new mongoose.Schema({
   },
   refreshToken: { type: String },
   status: { type: Boolean }
-});
+},
+{ timestamps: true });
 
 const users = mongoose.model('users', userSchema);
 

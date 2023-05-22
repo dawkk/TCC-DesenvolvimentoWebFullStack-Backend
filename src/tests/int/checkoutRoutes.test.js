@@ -203,8 +203,6 @@ describe('Testing checkouts routes', () => {
         const res = await request(app)
           .get(`/checkouts`)
           .set('Authorization', `Bearer ${accessTokenAdm}`)
-
-          console.log('this is res from get all request',res)
         expect(res.statusCode).toEqual(200);
       });
     })

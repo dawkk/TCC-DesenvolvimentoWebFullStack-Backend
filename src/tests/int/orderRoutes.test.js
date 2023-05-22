@@ -122,8 +122,6 @@ describe('Testing orders routes', () => {
         .post('/orders')
         .set('Authorization', `Bearer ${accessTokenMe}`)
         .send(payload);
-
-        console.log('this is response from test create order routes', res.body)
       orderDataResId = res.body._id;
       expect(res.statusCode).toEqual(201);
     });

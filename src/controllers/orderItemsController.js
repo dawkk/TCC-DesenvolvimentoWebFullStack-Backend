@@ -138,8 +138,6 @@ class OrderItemsController {
       if (!orderItem) {
         return res.status(404).send({ message: 'Item de pedido não encontrado.' });
       }
-      console.log('updateSelfOrderItem userId', userId)
-      console.log('updateSelfOrderItem userId', orderItem.userId)
       if (orderItem.userId.toString() !== userId) {
         return res.status(403).send({ message: 'Você não tem permissão para atualizar este item de pedido.' });
       }

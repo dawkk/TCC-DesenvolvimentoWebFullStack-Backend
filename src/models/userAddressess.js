@@ -7,7 +7,7 @@ const userAddressessSchema = new mongoose.Schema({
   neighborhood: { type: String },
   street: { type: String },
   number: { type: Number },
-  zipcode: { type: Number },
+  zipcode: { type: String },
   additionalInfo: { type: String },
   mainAddress: { type: Boolean, default: false }
 });

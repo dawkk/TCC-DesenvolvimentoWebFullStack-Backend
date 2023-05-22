@@ -16,16 +16,20 @@ menus.countDocuments({}, async (error, count) => {
     if (count === 0) {
       const initialMenus = [
         {
-          name: "Entrada"
+          name: "Entrada",
+          image: "image-1681655140312.jpg"
         },
         {
-          name: "Prato Principal"
+          name: "Prato Principal",
+          image:"image-1681655292917.jpg"
         },
         {
-          name: "Sobremesa"
+          name: "Sobremesa",
+          image:"image-1681655302285.jpg"
         },
         {
-          name: "Lanches"
+          name: "Lanches",
+          image: "image-1681655285435.jpg"
         }
       ];
       

@@ -23,6 +23,7 @@ class UserController {
     const id = req.params.id;
 
     const user = await users.findById(id, '-password')
+      .populate('addresses')
       .exec((err, users) => {
 
         if (err) {

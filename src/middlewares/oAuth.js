@@ -37,17 +37,16 @@ passport.use(
           
           await user.save();
         }
-        
-        // Generate JWT token for the user
         const tokenPayload = {
           UserInfo: {
             id: user._id,
-            roles: user.roles
+            roles: user.roles,
+            email: user.email
           }
         };
-        console.log('this is tokenPayload on oAuth', tokenPayload)
+      
         const token = jwt.sign(tokenPayload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '2h' });
-        console.log('this is token on oAuth', token)
+
         done(null, token);
       } catch (err) {
         done(err);
