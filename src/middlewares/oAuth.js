@@ -9,8 +9,8 @@ passport.use(
     {
       clientID: process.env.OAUTH_GOOGLE_CLIENT_ID,
       clientSecret: process.env.OAUTH_GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:8000/auth/google/callback",
-      userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
+      callbackURL: process.env.OAUTH_GOOGLE_CALLBACK_URL,
+      userProfileURL: process.env.OAUTH_GOOGLE_USERPROFILEURL,
       scope: ["profile", "email"],
       profileFields: ["name", "email"],
     },
