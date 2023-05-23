@@ -10,8 +10,13 @@ db.once("open", () => {
   console.log("conexão com o banco feita com sucesso")
 })
 
+const corsOptions = {
+  origin: process.env.FRONTEND_URL,
+  credentials: true
+}
+
 const app = express();
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
