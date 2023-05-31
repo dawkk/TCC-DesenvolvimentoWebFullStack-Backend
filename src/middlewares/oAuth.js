@@ -74,9 +74,11 @@ passport.use(
       clientID: process.env.OAUTH_GITHUB_CLIENT_ID,
       clientSecret: process.env.OAUTH_GITHUB_CLIENT_SECRET,
       callbackURL: process.env.OAUTH_GITHUB_CALLBACK_URL,
+      scope: ["user:email"],
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
+        console.log('this is profile', profile)
         let user = await users.findOne({ email: profile.emails[0].value }).exec();
 
         if (!user) {

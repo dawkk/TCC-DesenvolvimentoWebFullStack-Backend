@@ -197,7 +197,6 @@ class UserController {
 
     findUser.refreshToken = '';
     const result = await findUser.save();
-    /*   console.log(result); */
     res.clearCookie('jwt', { httpOnly: true, secure: true });
     res.sendStatus(204).json({ message: "Logout realizado com sucesso!" });;
   }
@@ -207,20 +206,20 @@ class UserController {
   static listUserAddress = async (req, res) => {
     const id = req.id;
     try {
-      const user = await users.findById(id);
+      const user = await users.findById(id).populate('addresses');
       if (!user) {
         return res.status(404).send({ message: "Usuário não encontrado" });
       }
-      const addressIds = user.addresses;
-      const addressesAll = await Promise.all(addressIds.map(async (addressId) => {
-        const addressEach = await addresses.findById(addressId);
-        return addressEach;
-      }));
-      return res.status(200).send(addressesAll);
+      
+      const activeAddresses = user.addresses.filter((address) => address.statusActive);
+      
+      return res.status(200).send(activeAddresses);
     } catch (err) {
       return res.status(500).send({ message: err.message });
     }
   };
+  
+  
 
   static listUserAddressById = async (req, res) => {
     const addressId = req.params.id;
@@ -246,25 +245,17 @@ class UserController {
       }
       const address = new addresses({
         userId: userId,
-        city: req.body.city,
-        state: req.body.state,
-        neighborhood: req.body.neighborhood,
-        street: req.body.street,
-        number: req.body.number,
-        zipcode: req.body.zipcode,
-        additionalInfo: req.body.additionalInfo,
-        mainAddress: req.body.mainAddress
+        ...req.body
       });
-
-      await address.save();
-      user.addresses.push(address._id);
-      await user.save();
-
+  
+      await Promise.all([address.save(), user.addresses.push(address._id), user.save()]);
+  
       return res.status(200).send(address);
     } catch (err) {
       return res.status(500).send({ message: err.message });
     }
-  }
+  };
+  
 
   static updateUserAddress = async (req, res) => {
     const addressId = req.params.id;

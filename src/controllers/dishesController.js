@@ -8,7 +8,7 @@ import fs from 'fs';
 class DishController {
 
   static listDishesFrontend = (req, res) => {
-    dishes.find()
+    dishes.find({ statusActive: true })
       .populate('menu')
       .exec((err, dishes) => {
         if (err) {
@@ -75,6 +75,7 @@ class DishController {
 
   static updateDish = (req, res) => {
     const id = req.params.id;
+    console.log('req body details', req.body)
     dishes.findByIdAndUpdate(id, { $set: req.body }, (err) => {
       if (!err) {
         res.status(200).send({ message: 'Prato atualizado com sucesso!' })
@@ -111,40 +112,9 @@ class DishController {
 
   /* IMAGE----------------------------------------------------- */
 
-  /* static uploadDishImage = [
-    upload.single("image"),
-    (req, res, next) => {
-      const id = req.params.id;
-      if (!req.file) {
-        res.status(400).send({ message: "No image file provided" });
-        return;
-      }
-      console.log('this is req received on backend', req)
-      console.log('this is dish ID received on backend', id)
-      dishes.findByIdAndUpdate(
-        id,
-        { image: req.file.filename },
-        (err, dish) => {
-          if (err) {
-            console.log('error message:', err)
-            res.status(500).send({ message: err.message });
-          } else if (!dish) {
-            console.log('error message:', dish)
-            console.log('error message:', err)
-            res.status(404).send({ message: `Dish ${id} not found` });
-          } else {
-            res.status(200).send({ success: 'Image uploaded successfully!', image: req.file.filename });
-          }
-        }
-      );
-    },
-  ];
- */
-
   static uploadDishImage = [
     (req, res, next) => {
       const id = req.params.id;
-      // Get the current dish information
       dishes.findById(id, (err, dish) => {
         if (err) {
           res.status(500).send({ message: err.message });
@@ -153,7 +123,6 @@ class DishController {
           res.status(404).send({ message: `Dish ${id} not found` });
           return;
         }
-        // Delete the current image if exists
         if (dish.image) {
           fs.unlink(`./src/temporary/uploads/${dish.image}`, (err) => {
             if (err) {
@@ -161,13 +130,11 @@ class DishController {
             }
           });
         }
-        // Upload the new image
         upload.single("image")(req, res, (err) => {
           if (err) {
             res.status(400).send({ message: "No image file provided" });
             return;
           }
-          // Update the dish with the new image filename
           dishes.findByIdAndUpdate(
             id,
             { image: req.file.filename },

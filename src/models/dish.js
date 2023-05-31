@@ -8,8 +8,9 @@ const dishSchema = new mongoose.Schema({
   price: { type: Number },
   menu: { type: mongoose.Schema.Types.ObjectId, ref: 'menus', required: true },
   type: { type: String },
-  image: { type: String }
-});
+  image: { type: String }, 
+  statusActive:{ type: Boolean, default:true }
+},  { timestamps: true });
 
 const dishes = mongoose.model('dishes', dishSchema);
 

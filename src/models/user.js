@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
     Admin: { type: Number }
   },
   refreshToken: { type: String },
-  status: { type: Boolean }
+  statusActive:{ type: Boolean, default:true }
 },
 { timestamps: true });
 

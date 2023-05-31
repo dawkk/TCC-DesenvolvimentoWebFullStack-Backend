@@ -12,7 +12,8 @@ router
   .put("/menus/:id", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), MenuController.updateMenu)
   .delete("/menus/:id", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), MenuController.deleteMenu)
   .get("/menus/:id", MenuController.listMenuById)
+  .get("/menus/all", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), MenuController.listAllMenus)
   .post("/menus", verifyJWT, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), MenuController.createMenu)
-  .get("/menus", MenuController.listMenus)
+  .get("/menus", MenuController.listMenusFrontend)
 
 export default router;

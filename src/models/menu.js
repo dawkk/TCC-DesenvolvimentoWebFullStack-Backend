@@ -3,9 +3,10 @@ import mongoose from "mongoose";
 const menuSchema = new mongoose.Schema(
   {
     name: {type: String, required: true, unique:true},
-    image: { type: String }
+    image: { type: String },
+    statusActive:{ type: Boolean, default:true }
   }
-);
+  ,  { timestamps: true });
 
 const menus = mongoose.model('menus', menuSchema)
 

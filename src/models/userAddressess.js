@@ -9,8 +9,10 @@ const userAddressessSchema = new mongoose.Schema({
   number: { type: Number },
   zipcode: { type: String },
   additionalInfo: { type: String },
-  mainAddress: { type: Boolean, default: false }
-});
+  mainAddress: { type: Boolean, default: false },
+  statusActive:{ type: Boolean, default:true }
+},
+{ timestamps: true });
 
 const addresses = mongoose.model('addresses', userAddressessSchema);
 

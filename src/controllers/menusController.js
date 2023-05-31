@@ -4,7 +4,19 @@ import fs from 'fs';
 
 class MenuController {
 
-  static listMenus = (req, res) => {
+  static listMenusFrontend = (req, res) => {
+    menus.find({ statusActive: true })
+      .sort({ name: 1 })
+      .exec((err, menus) => {
+        if(err) {
+          res.status(400).send({message: `${err.message} - Id do prato não encontrado. `})
+        } else {
+          res.status(200).json(menus);
+        }
+      });
+  }
+
+  static listAllMenus = (req, res) => {
     menus.find({})
       .sort({ name: 1 })
       .exec((err, menus) => {
