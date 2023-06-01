@@ -10,6 +10,8 @@ import paymentMethods from './paymentMethod.js';
 import users from './user.js';
 import addresses from './userAddressess.js';
 
+// Create sample data for addresses and return the address ID
+
 const menuMap = {};
 const dishMap = {};
 const userMap = {};
@@ -92,8 +94,8 @@ async function createDishes(menuMap) {
       image: "ceviche.jpg"
     },
     {
-      title: "Burguer Duplo Bacon",
-      description: "Cheeseburguer com dois hamburguers blend da casa de 150g, muito cheddar inglês, bacon crocante, alface, tomate, molho da casa rose",
+      title: "Burguer Tradicional",
+      description: "Cheeseburguer com dois hamburguers blend da casa de 150g, muito cheddar inglês, alface, tomate, molho da casa rose",
       price: 40,
       menu: "Lanches",
       image: "burguer-duplo.jpg"
@@ -147,6 +149,7 @@ async function createDishes(menuMap) {
           description: dish.description,
           price: dish.price,
           menu: menuId,
+          type: dish.type,
           image: dish.image
         });
         dishMap[createdDish.title] = createdDish._id;
@@ -351,14 +354,12 @@ async function createOrders() {
 
       for (let i = 0; i < 6; i++) {
         const orderStatusId = orderStatusMap[orderStatuses[i % orderStatuses.length]];
-        const orderItems = await createOrderItems(null, userId);
-        const totalAmount = calculateTotalAmount(orderItems);
         const order = {
           userId,
           deliveryAddress: addressId,
-          cartItems: orderItems,
+          cartItems: [],
           status: orderStatusId,
-          totalAmount,
+          totalAmount: 100,
           paymentMethod: paymentMethodId,
           dateOrdered: new Date(),
         };
@@ -373,17 +374,21 @@ async function createOrders() {
       orderIds.push(createdOrder._id);
       console.log(`Order created with ID: ${createdOrder._id}`);
 
-      for (const orderItem of order.cartItems) {
-        orderItemMap.set(orderItem, createdOrder._id);
+      const orderItems = await createOrderItems(createdOrder._id, order.userId);
+      if (Array.isArray(orderItems)) {
+        await updateCartItems(createdOrder._id, orderItems);
+        for (const orderItem of orderItems) {
+          orderItemMap.set(orderItem, createdOrder._id);
+        }
+      } else {
+        console.error(`Error: cartItems for order with ID ${createdOrder._id} is not an array.`);
       }
     }
-
     return orderIds;
   } catch (error) {
     console.error(error);
   }
 }
-
 
 async function createOrderItems(orderId, userId) {
   try {
@@ -443,17 +448,6 @@ function getRandomPaymentMethodId() {
   const randomIndex = Math.floor(Math.random() * paymentNames.length);
   const randomPaymentName = paymentNames[randomIndex];
   return paymentMap[randomPaymentName];
-}
-
-function calculateTotalAmount(orderItems) {
-  let totalAmount = 0;
-  for (const orderItem of orderItems) {
-    const dish = dishMap[orderItem.dishId];
-    const quantity = orderItem.quantity;
-    const dishPrice = dish.price;
-    totalAmount += dishPrice * quantity;
-  }
-  return totalAmount;
 }
 
 
