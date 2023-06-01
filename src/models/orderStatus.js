@@ -9,7 +9,7 @@ const orderStatusesSchema = new mongoose.Schema({
 });
 
 const orderStatus = mongoose.model('orderStatus', orderStatusesSchema);
-
+/* 
 orderStatus.countDocuments({}, (error, count) => {
   if (error) {
     console.error(error);
@@ -44,7 +44,7 @@ orderStatus.countDocuments({}, (error, count) => {
       });
     }
   }
-});
+}); */
 
 export default orderStatus;
 

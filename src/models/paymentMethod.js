@@ -9,6 +9,9 @@ const paymentMethodSchema = new mongoose.Schema(
 
 const paymentMethods = mongoose.model('paymentMethods', paymentMethodSchema)
 
+
+/* 
+
 const updatePaymentMethods = async () => {
   try {
     const count = await paymentMethods.countDocuments({});
@@ -42,7 +45,7 @@ const updatePaymentMethods = async () => {
 };
 
 await updatePaymentMethods();
-console.log(await updatePaymentMethods());
+console.log(await updatePaymentMethods()); */
 
 
 export default paymentMethods;

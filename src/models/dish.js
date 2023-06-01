@@ -7,14 +7,13 @@ const dishSchema = new mongoose.Schema({
   description: { type: String },
   price: { type: Number },
   menu: { type: mongoose.Schema.Types.ObjectId, ref: 'menus', required: true },
-  type: { type: String },
   image: { type: String }, 
   statusActive:{ type: Boolean, default:true }
 },  { timestamps: true });
 
 const dishes = mongoose.model('dishes', dishSchema);
 
-dishes.countDocuments({}, async (error, count) => {
+/* dishes.countDocuments({}, async (error, count) => {
   if (error) {
     console.error(error);
   } else {
@@ -94,6 +93,6 @@ dishes.countDocuments({}, async (error, count) => {
       await Promise.all(promises);
     }
   }
-});
+}); */
 
 export default dishes;

@@ -10,7 +10,7 @@ const menuSchema = new mongoose.Schema(
 
 const menus = mongoose.model('menus', menuSchema)
 
-menus.countDocuments({}, async (error, count) => {
+/* menus.countDocuments({}, async (error, count) => {
   if (error) {
     console.error(error);
   } else {
@@ -43,6 +43,6 @@ menus.countDocuments({}, async (error, count) => {
       });
     }
   }
-});
+}); */
 
 export default menus;
