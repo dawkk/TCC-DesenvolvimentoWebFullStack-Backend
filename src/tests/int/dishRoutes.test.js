@@ -2,11 +2,6 @@ import request from 'supertest';
 import app from '../../app.js';
 import * as dotenv from 'dotenv';
 import db from '../../config/dbConnect.js';
-import FormData from 'form-data';
-import fs from 'fs';
-import path from 'path';
-
-const cwd = process.cwd();
 
 dotenv.config();
 
@@ -156,66 +151,4 @@ describe('Testing dish routes', () => {
       });
     });
   })
-  /* describe('<- Add a image for an existing dish->', () => {
-    describe('given user is not logged in', () => {
-      it('should return a 401', async () => {
- 
-        const formData = new FormData();
-        formData.append('image', fs.createReadStream('./imageTest/test-image.jpg'));
- 
-        const res = await request(app)
-          .post('/dishes')
-          .send(dishData);
-        expect(res.statusCode).toEqual(401);
-      });
-    })
-    describe('given user is logged in but has no required authorization', () => {
-      it('should return a 403', async () => {
-        const formData = new FormData();
-        formData.append('image', fs.createReadStream('./imageTest/test-image.jpg'));
- 
-        const res = await request(app)
-          .post(`/dishes/${dishDataResId}/image`)
-          .set('Authorization', `Bearer ${accessTokenSimpleUser}`)
-          .set('Content-Type', 'multipart/form-data')
-          .send({ image: formData });
- 
-        expect(res.statusCode).toEqual(403);
-      });
-    });
-    describe('given user is logged in and has authorization', () => {
-      it('should return a 201 and create the dish', async () => {
- 
-        async function streamToBuffer(stream) {
-          const chunks = [];
-          return new Promise((resolve, reject) => {
-            stream.on('data', (chunk) => {
-              chunks.push(chunk);
-            });
-            stream.on('error', reject);
-            stream.on('end', () => {
-              resolve(Buffer.concat(chunks));
-            });
-          });
-        }
- 
-        const imagePath = path.join(cwd, '.', 'imageTest', 'test-image.jpg');
-        const imageStream = fs.createReadStream(imagePath);
- 
-        const formData = new FormData();
-        formData.append('image', imageStream);
-        console.log('formdata', formData);
- 
-        const buffer = await streamToBuffer(formData);
- 
-        const res = await request(app)
-          .post(`/dishes/${dishDataResId}/image`)
-          .set('Authorization', `Bearer ${accessTokenAdm}`)
-          .set('Content-Type', 'multipart/form-data')
-          .send(buffer);
- 
-        expect(res.statusCode).toEqual(201);
-      }, 20000);
-    });
-  }) */
 });

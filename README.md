@@ -15,20 +15,20 @@ Projeto de conclusão de curso desenvolvido durante o curso de Desenvolvimento W
 - [x] A equipe do restaurante pode:
   - [x] acessar menu administrativo
   - [x] realizar CRUD dos pratos
-  - [ ] realizar CRUD dos menus
-  - [ ] realizar CRUD de usuários
-  - [ ] alterar status de pedidos
-  - [ ] gerar relatórios
-  - [ ] extrair relatórios em pdf
+  - [x] realizar CRUD dos menus
+  - [x] realizar CRUD de usuários
+  - [x] alterar status de pedidos
+  - [x] gerar relatórios
+  - [x] extrair relatórios em pdf
 
 - [x] Os usuários tem acesso a aplicação web, onde podem:
   - [x] registrar-se com seus dados
   - [x] realizar login com suas credenciais
   - [x] navegar pelo site
   - [x] adicionar ou remover pratos de seu carrinho
-  - [ ] gerar pedido
-  - [ ] acompanhar pedidos
-  - [ ] alterar dados de registro/cadastro
+  - [x] gerar pedido
+  - [x] acompanhar pedidos
+  - [x] alterar dados de registro/cadastro
 
 ---
 
@@ -144,6 +144,6 @@ $ docker-compose up --build
 
 Este projeto esta sobe a licença [MIT](./LICENSE).
 
-Feito com ❤️ por Thiago Marinho 👋🏽 [Entre em contato!](https://www.linkedin.com/in/gmarconato/)
+Feito com ❤️ por Gabriel Marconato 👋🏽 [Entre em contato!](https://www.linkedin.com/in/gmarconato/)
 
 ---
