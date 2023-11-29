@@ -10,7 +10,6 @@ import paymentMethods from './paymentMethod.js';
 import users from './user.js';
 import addresses from './userAddressess.js';
 
-// Create sample data for addresses and return the address ID
 
 const menuMap = {};
 const dishMap = {};
@@ -41,12 +40,15 @@ async function createMenus() {
   ];
 
   try {
-    await menus.insertMany(initialMenus);
+    const existingMenus = await menus.find({ name: { $in: initialMenus.map(menu => menu.name) } });
 
-    const insertedMenus = await menus.find({ name: { $in: initialMenus.map(menu => menu.name) } });
-    insertedMenus.forEach(menu => {
-      menuMap[menu.name] = menu._id;
-    });
+    if (existingMenus.length === 0) {
+      const result = await menus.insertMany(initialMenus);
+      const insertedMenus = result.ops;
+      insertedMenus.forEach(menu => {
+        menuMap[menu.name] = menu._id;
+      });
+    }
 
     return menuMap;
 
@@ -200,15 +202,16 @@ async function createUsers() {
       },
     ];
 
-    const userIds = [];
+    const existingUsers = await users.find({ email: { $in: initialUsers.map(user => user.email) } });
 
-    for (const user of initialUsers) {
-      const createdUser = await users.create(user);
-      userIds.push(createdUser._id);
-      userMap[user.email] = createdUser._id;
+    if (existingUsers.length < initialUsers.length) {
+      const createdUsers = await users.insertMany(initialUsers);
+      createdUsers.ops.forEach(user => {
+        userMap[user.email] = user._id;
+      });
     }
 
-    return userIds;
+    return Object.values(userMap);
   } catch (error) {
     console.error(error);
   }
@@ -255,12 +258,18 @@ async function createUserAddresses(userMap) {
       },
     ];
     for (const address of initialUserAddresses) {
-      const createdAddress = await addresses.create(address);
-      addressMap[address.userId] = createdAddress._id;
-      const user = await users.findById(address.userId);
-      user.addresses.push(createdAddress._id);
-      await user.save();
+      const user = await users.findOne({ _id: userMap[address.userId] });
+
+      if (user) {
+        const createdAddress = await addresses.create(address);
+        addressMap[address.userId] = createdAddress._id;
+        user.addresses.push(createdAddress._id);
+        await user.save();
+      } else {
+        console.error(`User not found for address with userId: ${address.userId}`);
+      }
     }
+
     return addressMap;
   } catch (error) {
     console.error(error);
@@ -290,15 +299,16 @@ async function createPaymentMethods() {
       },
     ];
 
-    const paymentMethodIds = [];
+    const existingPaymentMethods = await paymentMethods.find({ name: { $in: initialPaymentMethods.map(method => method.name) } });
 
-    for (const paymentMethod of initialPaymentMethods) {
-      const createdPaymentMethod = await paymentMethods.create(paymentMethod);
-      paymentMethodIds.push(createdPaymentMethod._id);
-      paymentMap[createdPaymentMethod.name] = createdPaymentMethod._id;
-      console.log(`Payment method created with ID: ${createdPaymentMethod._id}`);
+    if (existingPaymentMethods.length === 0) {
+      const createdPaymentMethods = await paymentMethods.insertMany(initialPaymentMethods);
+      createdPaymentMethods.ops.forEach(method => {
+        paymentMap[method.name] = method._id;
+      });
     }
-    return paymentMethodIds;
+
+    return Object.values(paymentMap);
   } catch (error) {
     console.error(error);
   }
@@ -327,16 +337,16 @@ async function createOrderStatus() {
       },
     ];
 
-    const orderStatusIds = [];
+    const existingOrderStatuses = await orderStatus.find({ status: { $in: initialOrderStatus.map(status => status.status) } });
 
-    for (const orderStatuses of initialOrderStatus) {
-      const createdOrderStatus = await orderStatus.create(orderStatuses);
-      orderStatusIds.push(createdOrderStatus._id);
-      orderStatusMap[createdOrderStatus.status] = createdOrderStatus._id;
-      console.log(`Order status created with ID: ${createdOrderStatus._id}`);
+    if (existingOrderStatuses.length === 0) {
+      const createdOrderStatuses = await orderStatus.insertMany(initialOrderStatus);
+      createdOrderStatuses.ops.forEach(status => {
+        orderStatusMap[status.status] = status._id;
+      });
     }
 
-    return orderStatusIds;
+    return Object.values(orderStatusMap);
   } catch (error) {
     console.error(error);
   }
@@ -345,7 +355,8 @@ async function createOrderStatus() {
 async function createOrders() {
   try {
     const initialOrders = [];
-    const orderStatuses = Object.keys(orderStatusMap);
+    const orderStatuses = await orderStatus.find({});
+    const existingOrderStatuses = Object.keys(orderStatusMap);
 
     for (const userEmail in userMap) {
       const userId = userMap[userEmail];
@@ -353,7 +364,7 @@ async function createOrders() {
       const paymentMethodId = getRandomPaymentMethodId();
 
       for (let i = 0; i < 6; i++) {
-        const orderStatusId = orderStatusMap[orderStatuses[i % orderStatuses.length]];
+        const orderStatusId = orderStatusMap[orderStatuses[i % orderStatuses.length].status];
         const order = {
           userId,
           deliveryAddress: addressId,
@@ -367,24 +378,23 @@ async function createOrders() {
       }
     }
 
-    const orderIds = [];
+    const existingOrders = await orders.find({ userId: { $in: Object.values(userMap) } });
 
-    for (const order of initialOrders) {
-      const createdOrder = await orders.create(order);
-      orderIds.push(createdOrder._id);
-      console.log(`Order created with ID: ${createdOrder._id}`);
-
-      const orderItems = await createOrderItems(createdOrder._id, order.userId);
-      if (Array.isArray(orderItems)) {
-        await updateCartItems(createdOrder._id, orderItems);
-        for (const orderItem of orderItems) {
-          orderItemMap.set(orderItem, createdOrder._id);
+    if (existingOrders.length < initialOrders.length) {
+      const createdOrders = await orders.insertMany(initialOrders);
+      createdOrders.ops.forEach(order => {
+        const orderItems = createOrderItems(order._id, order.userId);
+        if (Array.isArray(orderItems)) {
+          updateCartItems(order._id, orderItems);
+          for (const orderItem of orderItems) {
+            orderItemMap.set(orderItem, order._id);
+          }
+        } else {
+          console.error(`Error: cartItems for order with ID ${order._id} is not an array.`);
         }
-      } else {
-        console.error(`Error: cartItems for order with ID ${createdOrder._id} is not an array.`);
-      }
+      });
     }
-    return orderIds;
+
   } catch (error) {
     console.error(error);
   }
@@ -393,27 +403,15 @@ async function createOrders() {
 async function createOrderItems(orderId, userId) {
   try {
     const initialOrderItems = [];
-    for (let i = 0; i < 5; i++) {
-      const dishId = getRandomDishId();
-      const quantity = getRandomQuantity();
-      const orderItem = {
-        userId,
-        orderId,
-        dishId,
-        quantity,
-      };
-      initialOrderItems.push(orderItem);
+    const existingOrderItems = await orderItems.find({ orderId });
+
+    if (existingOrderItems.length === 0) {
+      const createdOrderItems = await orderItems.insertMany(initialOrderItems);
+      return createdOrderItems.ops.map(item => item._id);
+    } else {
+      return existingOrderItems.map(item => item._id);
     }
 
-    const orderItemIds = [];
-
-    for (const orderItem of initialOrderItems) {
-      const createdOrderItem = await orderItems.create(orderItem);
-      orderItemIds.push(createdOrderItem._id);
-      console.log(`Order item created with ID: ${createdOrderItem._id}`);
-    }
-
-    return initialOrderItems; // Return the initial order items instead of just the IDs
   } catch (error) {
     console.error(error);
   }
@@ -433,10 +431,9 @@ async function updateCartItems(orderId, orderItemIds) {
 /* FUNCTIONS TO RANDOMIZE */
 
 function getRandomDishId() {
-  const dishTitles = Object.keys(dishMap);
-  const randomIndex = Math.floor(Math.random() * dishTitles.length);
-  const randomDishTitle = dishTitles[randomIndex];
-  return dishMap[randomDishTitle];
+  const dishIds = Object.values(dishMap);
+  const randomIndex = Math.floor(Math.random() * dishIds.length);
+  return dishIds[randomIndex];
 }
 
 function getRandomQuantity() {
@@ -444,11 +441,11 @@ function getRandomQuantity() {
 }
 
 function getRandomPaymentMethodId() {
-  const paymentNames = Object.keys(paymentMap);
-  const randomIndex = Math.floor(Math.random() * paymentNames.length);
-  const randomPaymentName = paymentNames[randomIndex];
-  return paymentMap[randomPaymentName];
+  const paymentIds = Object.values(paymentMap);
+  const randomIndex = Math.floor(Math.random() * paymentIds.length);
+  return paymentIds[randomIndex];
 }
+
 
 
 /* CALL ALL FUNCTIONS */
@@ -463,36 +460,34 @@ export async function initializeData() {
     const orderCount = await orders.countDocuments();
 
     if (menuCount === 0) {
-      const createdMenus = await createMenus();
+      await createMenus();
       console.log(`Created menus.`);
     }
 
     if (dishCount === 0) {
-      const createdDishes = await createDishes(menuMap);
+      await createDishes(menuMap);
       console.log(`Created dishes.`);
     }
 
-    console.log('User Count:', userCount);
-
     if (userCount < 4) {
-      const userIds = await createUsers();
-      const addressMap = await createUserAddresses(userMap);
+      await createUsers();
+      await createUserAddresses(userMap);
       console.log(`Created users.`);
       console.log('User Addresses:', addressMap);
     }
 
     if (paymentCount === 0) {
-      const createdPaymentMethods = await createPaymentMethods();
+      await createPaymentMethods();
       console.log(`Created payment methods.`);
     }
 
     if (orderStatusCount === 0) {
-      const createdOrderStatus = await createOrderStatus();
+      await createOrderStatus();
       console.log(`Created  order statuses.`);
     }
 
     if (orderCount < 20) {
-      const allCreatedOrderIds = await createOrders();
+      await createOrders();
       console.log(`Created orders.`);
       console.log('Order Items:', orderItemMap);
     }

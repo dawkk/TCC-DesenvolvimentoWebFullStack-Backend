@@ -24,8 +24,7 @@ const userSchema = new mongoose.Schema({
 
 const users = mongoose.model('users', userSchema);
 
-/* 
-users.countDocuments({}, (error, count) => {
+/* users.countDocuments({}, (error, count) => {
   if (error) {
     console.error(error);
   } else {
@@ -102,8 +101,8 @@ users.countDocuments({}, (error, count) => {
       });
     }
   }
-}); */
-
+});
+ */
 
 
 
